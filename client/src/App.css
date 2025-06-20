@@ -1,0 +1,17 @@
+/* @media (max-width: 450px) {
+   .navInput1{
+    display: flex;
+   }
+   .navInput2{
+    display: none;
+   }
+  }
+
+@media (min-width: 450px) {
+        .navInput1{
+        display: none;
+         }
+         .navInput2{
+        display: flex;
+         }
+    } */

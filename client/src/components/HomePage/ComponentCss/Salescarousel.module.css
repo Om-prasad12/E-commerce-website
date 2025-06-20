@@ -1,0 +1,115 @@
+.embla {
+    max-width: 100%;
+    --slide-spacing: 1rem;
+    --slide-size: 20%; /* Default slide size */
+}
+
+.embla__viewport {
+  overflow: hidden;
+}
+
+.embla__container {
+  display: flex;
+  touch-action: pan-y pinch-zoom;
+  margin-left: calc(var(--slide-spacing) * -1);
+}
+
+.embla__slide {
+    position: relative; /* Ensure proper positioning */
+    transform: translate3d(0, 0, 0);
+    flex: 0 0 var(--slide-size);
+    min-width: 270px; /* Prevent shrinking below the set size */
+    padding-left: var(--slide-spacing);
+    overflow: hidden; /* Hide overflow within each slide */
+  }
+
+/* Controls */
+.embla__controls {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  justify-content: space-between;
+  gap: 1.2rem;
+  margin-top: 1.8rem;
+}
+
+.embla__buttons {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.6rem;
+  align-items: center;
+}
+
+.embla__button {
+  -webkit-tap-highlight-color: rgba(var(--text-high-contrast-rgb-value), 0.5);
+  -webkit-appearance: none;
+  appearance: none;
+  background-color: transparent;
+  touch-action: manipulation;
+  display: inline-flex;
+  text-decoration: none;
+  cursor: pointer;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  box-shadow: inset 0 0 0 0.2rem var(--detail-medium-contrast);
+  width: 3rem; /* Adjusted width */
+  height: 3rem; /* Adjusted height */
+  border-radius: 50%;
+  color: var(--text-body);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1; /* Ensure button is above content */
+}
+
+/* Responsive adjustments */
+
+
+
+/* Discount Label */
+.embla__slide .absolute {
+  position: absolute;
+  top: 2rem;
+  right: 1rem;
+  z-index: 2; /* Ensure button is above content */
+}
+
+/* Adjust button position if necessary */
+.embla__slide .absolute button {
+  padding: 0.5rem;
+  background-color: white;
+  border-radius: 50%;
+  box-shadow: 0 0 0 0.2rem var(--detail-medium-contrast);
+}
+
+@media (max-width: 350px) {
+  .embla {
+      --slide-size: 100%; /* Larger slide size for extra small screens */
+  }
+  .embla__buttons{
+    display: none;
+  }
+}
+
+@media (min-width: 350px) and (max-width: 770px) {
+  .embla {
+      --slide-size: 50%; /* Larger slide size for small screens */
+  }
+  .embla__buttons{
+    display: none;
+  }
+}
+
+
+@media (min-width: 770px) and (max-width: 992px) {
+  .embla {
+      --slide-size: 30%; /* Medium slide size for medium screens */
+  }
+}
+
+@media (min-width: 993px) {
+  .embla {
+      --slide-size: 20%; /* Default slide size for large screens */
+  }
+
+}
