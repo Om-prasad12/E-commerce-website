@@ -1,6 +1,6 @@
 const mongoose= require('../db/db');;
 
-const shortid = require('shortid'); // You can install this with npm
+const shortid = require('shortid');
 
 
 
