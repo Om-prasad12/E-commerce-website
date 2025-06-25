@@ -109,11 +109,10 @@ async function getMyCart(req, res) {
 //For user to add item to their cart
 async function addToCart(req, res) {
   try {
-    const { productId} = req.body;
+    const { productId,vendorId} = req.body;
     if (!productId) {
       return res.status(400).json({ message: 'Product ID and quantity are required' });
     }
-
     const user = await userModel.findById(req.userId);
     if (!user) return res.status(404).json({ message: 'Login to add product into cart' });
 
@@ -122,7 +121,7 @@ async function addToCart(req, res) {
     if (existingItem) {
       existingItem.quantity +=1; // Update quantity
     } else {
-      user.cart.push({ productId}); // Add new item
+      user.cart.push({ productId,vendorId}); // Add new item
     }
 
     await user.save();
@@ -181,9 +180,9 @@ async function getMyWishlist(req,res){
 //For user to add item to their wishlist
 async function addToWishlist(req, res) {
   try {
-    const { productId } = req.body;
-    if (!productId) {
-      return res.status(400).json({ message: 'Product ID is required' });
+    const { productId,vendorId } = req.body;
+    if (!productId || !vendorId) {
+      return res.status(400).json({ message: 'Product ID and Vendor ID are required' });
     }
 
     const user = await userModel.findById(req.userId);
@@ -197,7 +196,7 @@ async function addToWishlist(req, res) {
       return res.status(400).json({ message: 'Wishlist limit reached (20 items)' });
     }
 
-    user.wishlist.push(productId); // Add new item
+    user.wishlist.push({ product: productId, vendorId }); // Add new item with vendor
     await user.save();
     
     res.status(200).json({ message: 'Item added to wishlist', wishlist: user.wishlist });

@@ -25,6 +25,10 @@ const cartItemSchema = new mongoose.Schema({
     type: Number,
     default: 1
   },
+  vendorId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  },
   priceAtAddition: Number,
   variant: {
     size: String,
@@ -104,6 +108,10 @@ const userSchema = new mongoose.Schema({
   product: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Product'
+  },
+  vendorId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
   }
   }],
 
