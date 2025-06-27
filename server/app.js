@@ -19,12 +19,14 @@ const userRouter=require('./Routers/userRouter');
 const prodRouter=require('./Routers/prodRouter');
 const authRouter=require('./Routers/authRouter');
 const homeRouter=require('./Routers/homeRouter');
+const orderRouter=require('./Routers/orderRouter');
+
 
 app.use('/prod',prodRouter);
 app.use('/user',userRouter);
 app.use('/auth',authRouter);
 app.use('/home',homeRouter); 
-
+app.use('/order',orderRouter);
 
 
 

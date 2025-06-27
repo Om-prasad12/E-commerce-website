@@ -1,9 +1,6 @@
 const userModel = require('../models/userModel')
 
 
-//Middleware to get user id
-
-
 
 //For the admin to get all users
 async function getUser(req, res){
@@ -180,31 +177,33 @@ async function getMyWishlist(req,res){
 //For user to add item to their wishlist
 async function addToWishlist(req, res) {
   try {
-    const { productId,vendorId } = req.body;
-    if (!productId || !vendorId) {
-      return res.status(400).json({ message: 'Product ID and Vendor ID are required' });
+    const { productId, vendorId } = req.body;
+    if (!productId) {
+      return res.status(400).json({ message: 'Product ID  are required' });
     }
 
     const user = await userModel.findById(req.userId);
     if (!user) return res.status(404).json({ message: 'Login to add product into wishlist' });
 
-    // Check if product already exists in wishlist
-    if (user.wishlist.includes(productId)) {
+    const alreadyInWishlist = user.wishlist.some(item => item.product.toString() === productId);
+    if (alreadyInWishlist) {
       return res.status(400).json({ message: 'Product already in wishlist' });
     }
-    if(user.wishlist.length >= 20) {
+
+    if (user.wishlist.length >= 20) {
       return res.status(400).json({ message: 'Wishlist limit reached (20 items)' });
     }
 
-    user.wishlist.push({ product: productId, vendorId }); // Add new item with vendor
+    user.wishlist.push({ product: productId, vendorId });
     await user.save();
-    
+
     res.status(200).json({ message: 'Item added to wishlist', wishlist: user.wishlist });
   } catch (error) {
     console.error('Error adding to wishlist:', error);
-    res.status(500).json({message:'Something went wrong',error:error.message});
+    res.status(500).json({ message: 'Something went wrong', error: error.message });
   }
 }
+
 
 //For user to delete item from their wishlist 
 async function deleteWishlist(req, res) {
