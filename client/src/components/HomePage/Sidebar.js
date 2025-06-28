@@ -47,7 +47,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
     <div className="bg-white">I
       {/* Container with max width for centering content on large screens */}
       <div className="max-w-[1530px] mx-auto bg-white ">
-        <div className="flex h-auto w-full  mt-32 md:mt-28 mb-5 md:mb-16">
+        <div className="flex h-auto w-full  mt-32 md:mt-20 mb-5 md:mb-16">
           {/* Sidebar Section */}
           <div className="relative md:mt-5">
             {/* Overlay */}
@@ -60,7 +60,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
 
             {/* Sidebar */}
             <div
-              className={`flex flex-col bg-white text-black w-auto h-[400px] border-l-2 border-r-2 border-gray-300 space-y-3 py-3 px-2 absolute inset-y-0 left-0 transform ${
+              className={`flex flex-col bg-white text-black w-auto h-[400px]  border-r-2 border-gray-300 space-y-3 py-3 px-2 absolute inset-y-0 left-0 transform ${
                 isOpen ? "translate-x-0" : "-translate-x-full"
               } transition-transform duration-200 ease-in-out z-30 md:relative md:translate-x-0`}
             >
@@ -85,7 +85,6 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
                           <Link
                             key={subIndex}
                             to={subcategory.link}
-                            onClick={closeSidebar}
                             className="block px-4 py-1 hover:bg-gray-200 rounded-md text-base font-medium"
                           >
                             {subcategory.name}
@@ -102,7 +101,6 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
                     key={index}
                     to={link.link}
                     className="flex items-center space-x-2 px-4 py-1 hover:bg-gray-200 rounded-md text-base font-medium"
-                    onClick={closeSidebar}
                   >
                     <span>{link.name}</span>
                   </Link>
