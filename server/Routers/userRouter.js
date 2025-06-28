@@ -2,16 +2,14 @@ const express = require('express')
 const userRouter=express.Router();
 const { verifyUser,isAdmin } = require('../middleware/authMiddleware');
 const {getUser,getUserId,getMyProfile,updateMyProfile,deleteMyProfile,
-  getMyCart,addToCart,updateCart,getMyWishlist,addToWishlist,deleteWishlist
+  getMyCart,addToCart,updateCart,getMyWishlist,addToWishlist,deleteWishlist,getMyOrders
 } = require('../controller/userController');
 
 userRouter
 .route('/')
 .get(verifyUser,isAdmin,getUser)
 
-userRouter
-.route('/:id')
-.get(verifyUser,getUserId)
+
 
 userRouter
 .route('/me')
@@ -31,6 +29,13 @@ userRouter
 .post(verifyUser,addToWishlist)
 .delete(verifyUser,deleteWishlist)
 
+userRouter
+.route('/orders')
+.get(verifyUser,getMyOrders)
+
+userRouter
+.route('/getProfile/:id')
+.get(verifyUser,getUserId)
 
 // .get(Verifyemail);
 

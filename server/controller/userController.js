@@ -232,6 +232,18 @@ async function deleteWishlist(req, res) {
     }
 }
 
+async function getMyOrders(req, res) {
+    try {
+        const user = await userModel.findById(req.userId).populate('orders');
+        if (!user) return res.status(404).json({ message: 'User not found' });
+        
+        res.status(200).json(user.orders);
+    } catch (error) {
+        console.error('Error fetching orders:', error);
+        res.status(500).json({message:'Something went wrong',error:error.message});
+    }
+}
+
 module.exports = {
     getUser,
     getUserId,
@@ -243,5 +255,6 @@ module.exports = {
     updateCart,
     getMyWishlist,
     addToWishlist,
-    deleteWishlist
+    deleteWishlist,
+    getMyOrders
 };

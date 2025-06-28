@@ -52,5 +52,28 @@ const getOrderById = async (req, res) => {
   }
 }
 
+const updateOderStatus = async (req, res) => {
+  try{
+      const { id } = req.params;
+      const { orderStatus } = req.body;
+      const orderStatusCheck= await OrderModel.findById(id);
+      if (!orderStatusCheck) {
+        return res.status(404).json({ message: 'Order not found' });
+      }
+      if(orderStatusCheck.orderStatus === 'Delivered' || orderStatusCheck.orderStatus === 'Cancelled'){
+        return res.status(400).json({ message: `Order status cannot be updated for ${orderStatusCheck.orderStatus} orders` });
+      }
+      const order = await OrderModel.findByIdAndUpdate(
+        id,
+        { orderStatus },
+        { new: true }
+      );
 
-module.exports ={getAllOrders, getOrderById,createOrder};
+      res.status(200).json({ message: 'Order status updated successfully', order });
+  } catch (error) {
+    res.status(500).json({ message: 'Error updating order status', error });
+  }
+}
+
+
+module.exports ={getAllOrders, getOrderById,createOrder, updateOderStatus};
