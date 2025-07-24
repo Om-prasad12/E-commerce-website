@@ -30,11 +30,20 @@ const productSchema = new mongoose.Schema(
       required: true,
       min: 0,
     },
+    actualPrice: {
+      type: Number,
+      required: false,
+      min: 0,
+    },
     discount: {
       type: Number,
       default: 0, // in percentage
       min: 0,
       max: 100,
+    },
+    promoTagline:{
+      type: String,
+      default: '',
     },
     stock: {
       type: Number,

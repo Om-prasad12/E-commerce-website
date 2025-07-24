@@ -3,6 +3,7 @@
     "bcrypt": "^6.0.0",
     "cloudinary": "^2.6.1",
     "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
     "dotenv": "^16.5.0",
     "email-validator": "^2.0.4",
     "express": "^4.21.2",

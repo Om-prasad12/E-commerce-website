@@ -2,6 +2,7 @@ const express = require('express')
 const app = express()
 const port=process.env.PORT || 8000;
 const cookieParser = require('cookie-parser');
+var cors = require('cors')
 require('dotenv').config();
 
 
@@ -9,7 +10,12 @@ app.listen(port,(req, res)=> {
     console.log("Connection has been made")
 })
 
-
+var corsOptions = {
+  origin: 'http://localhost:3000',
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
+}
+app.use(cors(corsOptions));
 
 // Middleware to parse JSON bodies
 app.use(express.json());

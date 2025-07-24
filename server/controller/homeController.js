@@ -2,8 +2,8 @@ const homeModel = require('../models/homeModel');
 
 async function getHomePageData(req, res) {
     try{
-        const homeData = await homeModel.find().populate();
-        if (!homeData || homeData.length === 0) {
+        const homeData = await homeModel.find().populate('product');
+        if (!homeData) {
             return res.status(404).json({ message: 'No home page data found' });
         }
         res.status(200).json(homeData);

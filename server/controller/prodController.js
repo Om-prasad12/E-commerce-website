@@ -38,6 +38,8 @@ const createProduct = async (req, res) => {
       category,
       brand,
       price,
+      actualPrice: req.body.actualPrice || price,
+      promoTagline: req.body.promoTagline || '', 
       discount,
       stock,
       minOrderQty,
