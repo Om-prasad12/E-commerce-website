@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { FaChevronDown } from "react-icons/fa";
 import Maincarousel from "./Maincarousel";
 
-const Sidebar = ({ isOpen, toggleSidebar }) => {
+const Sidebar = ({ isOpen, toggleSidebar, data}) => {
   const [openCategoryIndex, setOpenCategoryIndex] = useState(null);
 
   const closeSidebar = () => {
@@ -111,7 +111,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
 
           {/* Main Content Section */}
           <div className="flex justify-center md:justify-start  items-center md:ml-14 xl:mx-16 xl:my-11 h-auto w-full max-w-full">
-            <Maincarousel />
+            <Maincarousel data={data}/>
           </div>
         </div>
       </div>

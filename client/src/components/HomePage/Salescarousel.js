@@ -1,4 +1,6 @@
 import React from "react";
+import { useState,useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import styles from "./ComponentCss/Salescarousel.module.css";
 import { CiHeart } from "react-icons/ci";
 import Stars from "./Stars";
@@ -10,78 +12,27 @@ import {
 import useEmblaCarousel from "embla-carousel-react";
 import CountdownTimer from "./CountdownTimer";
 
-const Salescarousel = () => {
+const Salescarousel = ({data}) => {
+  const navigate = useNavigate();
+
   const [emblaRef, emblaApi] = useEmblaCarousel({
     align: "start",
     containScroll: false,
     loop: true,
   });
 
-  const slides = [
-    {
-      id: 1,
-      image: "../../assets/Salescarousel/slide1.png",
-      discount: "-40%",
-      title: "HAVIT HV-G92 Gamepad",
-      price: "₹ 1,499",
-      actualPrice: "₹ 2,499",
-      ratings: 4.5,
-    },
-    {
-      id: 2,
-      image: "../../assets/Salescarousel/slide2.png",
-      discount: "-40%",
-      title: "HAVIT HV-G92 Gamepad",
-      price: "₹ 1,499",
-      actualPrice: "₹ 2,499",
-      ratings: 4.6,
-    },
-    {
-      id: 3,
-      image: "../../assets/Salescarousel/slide3.png",
-      discount: "-40%",
-      title: "HAVIT HV-G92 Gamepad",
-      price: "₹ 1,499",
-      actualPrice: "₹ 2,499",
-      ratings: 4.1,
-    },
-    {
-      id: 4,
-      image: "../../assets/Salescarousel/slide4.png",
-      discount: "-40%",
-      title: "HAVIT HV-G92 Gamepad",
-      price: "₹ 1,499",
-      actualPrice: "₹ 2,499",
-      ratings: 4.9,
-    },
-    {
-      id: 5,
-      image: "../../assets/Salescarousel/slide2.png",
-      discount: "-40%",
-      title: "HAVIT HV-G92 Gamepad",
-      price: "₹ 1,499",
-      actualPrice: "₹ 2,499",
-      ratings: 3.9,
-    },
-    {
-      id: 6,
-      image: "../../assets/Salescarousel/slide4.png",
-      discount: "-40%",
-      title: "HAVIT HV-G92 Gamepad",
-      price: "₹ 1,499",
-      actualPrice: "₹ 2,499",
-      ratings: 4.9,
-    },
-    {
-      id: 7,
-      image: "../../assets/Salescarousel/slide3.png",
-      discount: "-40%",
-      title: "HAVIT HV-G92 Gamepad",
-      price: "₹ 1,499",
-      actualPrice: "₹ 2,499",
-      ratings: 4.1,
-    },
-  ];
+  const [mainContent,setMainContent] = useState([
+      
+  ]);
+  
+  useEffect(() => {
+      if (data && data.length > 0) {
+        setMainContent(data);
+      } else {
+        // console.error("No data available for the carousel.");
+      }
+  },[data])
+
   const {
     prevBtnDisabled,
     nextBtnDisabled,
@@ -120,7 +71,7 @@ const Salescarousel = () => {
             <p className="text-2xl md:text-4xl font-semibold tracking-wide mt-2 mr-3 md:mr-5 xl:mr-6">
               Flash Sales
             </p>
-            <CountdownTimer targetDate="2025-06-18T00:00:00" />
+            <CountdownTimer targetDate="2025-08-18T00:00:00" />
           </div>
         </div>
         <div className={`${styles.embla__controls} mr-3`}>
@@ -138,21 +89,27 @@ const Salescarousel = () => {
       </div>
       <div className={`${styles.embla__viewport} mt-8`} ref={emblaRef}>
         <div className={styles.embla__container}>
-          {slides.map((data) => {
-            const { id, image, discount, price, actualPrice, ratings } = data;
+          {mainContent.map((data) => {
+            const {_id, images, discount, price, actualPrice, ratings } = data.product;
 
             return (
-              <div className={styles.embla__slide} key={id}>
-                <div className=" border-2  rounded-lg overflow-hidden relative">
+              <div className={styles.embla__slide} key={_id}>
+                <div className="rounded-lg overflow-hidden relative cursor-pointer"
+                onClick={() => {navigate(`/product/${_id}`);}}>
+                  <div className=" border-2  rounded-lg overflow-hidden relative">
                   {/* Discount Label */}
                   {discount && (
                     <div className="absolute top-2 mx-2 bg-red-500 text-white px-3 py-1 text-base rounded-md font-bold">
-                      {discount}
+                      -{discount}%
                     </div>
                   )}
                   {/* Icons */}
                   <div className="absolute top-2 right-1 flex space-x-2">
-                    <button className="p-2 bg-white rounded-full shadow">
+                    <button className="p-2 bg-white rounded-full shadow"
+                      onClick={(e) => {
+                      e.stopPropagation();  //Stop event bubbling to parent div
+                      navigate('/likedProducts');
+                    }}>
                       <CiHeart />
                     </button>
                   </div>
@@ -160,7 +117,7 @@ const Salescarousel = () => {
                   {/* Product Image */}
                   <div className="flex justify-center items-center p-10 md:p-10 xl:p-12 bg-gray-100">
                     <img
-                      src={image}
+                      src={images[0]}
                       alt="product"
                       className="w-[100px]  sm:w-[120px]  md:w-[150px]  xl:w-[172px]  aspect-[113/100]"
                     />
@@ -185,6 +142,8 @@ const Salescarousel = () => {
                     </div>
                   </div>
                 </div>
+                </div>
+                
               </div>
             );
           })}

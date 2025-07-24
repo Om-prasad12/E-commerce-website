@@ -3,47 +3,21 @@ import { useNavigate } from "react-router-dom";
 import Stars from "./Stars";
 import { CiHeart } from "react-icons/ci";
 
-const Sales = () => {
+const Sales = ({data}) => {
   const navigate = useNavigate();
 
-  const slides = [
-    {
-      id: 1,
-      image: "../../assets/Salescarousel/slide1.png",
-      discount: "-40%",
-      title: "HAVIT HV-G92 Gamepad",
-      price: "₹ 1,499",
-      actualPrice: "₹ 2,499",
-      ratings: 4.5,
-    },
-    {
-      id: 2,
-      image: "../../assets/Salescarousel/slide2.png",
-      discount: "-40%",
-      title: "HAVIT HV-G92 Gamepad",
-      price: "₹ 1,499",
-      actualPrice: "₹ 2,499",
-      ratings: 4.6,
-    },
-    {
-      id: 3,
-      image: "../../assets/Salescarousel/slide3.png",
-      discount: "-40%",
-      title: "HAVIT HV-G92 Gamepad",
-      price: "₹ 1,499",
-      actualPrice: "₹ 2,499",
-      ratings: 4.1,
-    },
-    {
-      id: 4,
-      image: "../../assets/Salescarousel/slide4.png",
-      discount: "-40%",
-      title: "HAVIT HV-G92 Gamepad",
-      price: "₹ 1,499",
-      actualPrice: "₹ 2,499",
-      ratings: 4.9,
-    },
-  ];
+    const [mainContent,setMainContent] = useState([
+        
+    ]);
+    
+    useEffect(() => {
+        if (data && data.length > 0) {
+          setMainContent(data);
+        } else {
+          // console.error("No data available for the carousel.");
+        }
+    },[data])
+
 
   const [visibleItems, setVisibleItems] = useState(4);
 
@@ -74,7 +48,7 @@ const Sales = () => {
             <div className="flex justify-between h-auto">
               <div>
                 <div className="flex">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="40" viewBox="0 0 20 40" fill="none">
+                  <svg xmlns="http:/</div>/www.w3.org/2000/svg" width="20" height="40" viewBox="0 0 20 40" fill="none">
                     <rect width="20" height="40" rx="4" fill="#DB4444" />
                   </svg>
                   <p className="mt-2 mx-1 xl:m-3 text-base font-semibold" style={{ color: "#DB4444" }}>
@@ -95,32 +69,40 @@ const Sales = () => {
             </div>
 
             <div className="flex justify-center md:justify-start m-4 overflow-hidden gap-x-4 md:gap-x-6">
-              {slides.slice(0, visibleItems).map(({ id, image, discount, price, actualPrice, ratings, title }) => (
+              {mainContent.slice(0, visibleItems).map(({product: { _id,images,title,discount,ratings,actualPrice,price } }) => (
                 <div
-                  key={id}
+                  key={_id}
                   style={{
                     flex: `0 0 calc(100% / ${visibleItems} - 1rem)`,
                     maxWidth: `calc(100% / ${visibleItems} - 1rem)`,
                   }}
                 >
-                  <div className="border-2 rounded-lg overflow-hidden relative">
+                <div className="rounded-lg overflow-hidden relative cursor-pointer"
+                onClick={() => {navigate(`/product/${_id}`);}}>
+                 <div className="border-2 rounded-lg overflow-hidden relative">
                     {discount && (
                       <div className="absolute top-2 mx-2 bg-red-500 text-white px-3 py-1 text-base rounded-md font-bold">
-                        {discount}
+                        -{discount}%
                       </div>
                     )}
 
                     <div className="absolute top-2 right-1 flex space-x-2">
-                      <button className="p-2 bg-white rounded-full shadow">
+                      <button className="p-2 bg-white rounded-full shadow"
+                        onClick={(e) => {
+                          e.stopPropagation();  // Stop event bubbling to parent div
+                          navigate('/likedProducts');
+                        }}>
                         <CiHeart />
                       </button>
                     </div>
 
                     <div className="flex justify-center items-center p-10 md:p-10 xl:p-12 bg-gray-100">
-                      <img src={image} alt="product" className="w-[100px] sm:w-[120px] md:w-[150px] xl:w-[172px] aspect-[113/100]" />
+                      <img src={images[0]} alt="product" className="w-[100px] sm:w-[120px] md:w-[150px] xl:w-[172px] aspect-[113/100]" />
                     </div>
 
-                    <div className="text-base font-semibold m-2">{title}</div>
+                    <div className="text-base font-semibold m-2">
+                      {title.length > 30 ? `${title.slice(0, 30)}...` : title}
+                    </div>
 
                     <div className="px-3 py-2 bg-white">
                       <div className="flex">
@@ -128,11 +110,13 @@ const Sales = () => {
                         {actualPrice && <div className="text-gray-400 text-lg line-through m-2">{actualPrice}</div>}
                       </div>
 
-                      <div className="flex space-x-1 w-auto h-auto">
+                      <div className="flex space-x-1 w-au</div>to h-auto">
                         <Stars ratings={ratings} />
                       </div>
                     </div>
-                  </div>
+                  </div> 
+                </div>  
+                  
                 </div>
               ))}
             </div>

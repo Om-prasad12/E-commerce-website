@@ -1,35 +1,27 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
+import { useState,useEffect } from "react";
 import useEmblaCarousel from "embla-carousel-react";
 import Autoplay from "embla-carousel-autoplay";
 
-export default function Maincarousel() {
+export default function Maincarousel({data}) {
   const [emblaRef] = useEmblaCarousel({ loop: true }, [
     Autoplay({ delay: 3000 }),
   ]);
+  
+  const [mainContent,setMainContent] = useState([
+    
+  ]);
 
-  const slides = [
-    {
-      id: 1,
-      backgroundImage: 'url("../../assets/Maincarousel/image1.jpg")',
-      logo: "../../assets/Maincarousel/apple-logo.png",
-      title: "iPhone 14 Series",
-      subtitle: "Up to 10% off Voucher",
-    },
-    {
-      id: 2,
-      backgroundImage: 'url("../../assets/Maincarousel/image1.jpg")',
-      logo: "../../assets/Maincarousel/apple-logo.png",
-      title: "Galaxy S21 Series",
-      subtitle: "Limited Time Offer",
-    },
-    {
-      id: 3,
-      backgroundImage: 'url("../../assets/Maincarousel/image1.jpg")',
-      logo: "../../assets/Maincarousel/apple-logo.png",
-      title: "OnePlus 9 Pro",
-      subtitle: "Exclusive Discount",
-    },
-  ];
+  useEffect(() => {
+    if (data && data.length > 0) {
+      setMainContent(data);
+    } else {
+      // console.error("No data available for the carousel.");
+    }
+  },[data])
+   
+  const navigate = useNavigate();
 
   return (
     <div
@@ -37,7 +29,7 @@ export default function Maincarousel() {
       ref={emblaRef}
     >
       <div className="embla__container flex">
-        {slides.map((slide) => (
+        {mainContent.map((slide) => (
           <div
             key={slide.id}
             className="embla__slide flex-none w-[80vw] md:w-[60vw] xl:w-[892px] bg-cover bg-center border-2 aspect-[259/100] 
@@ -47,16 +39,18 @@ export default function Maincarousel() {
             <div className="flex flex-col justify-center ml-6 sm:ml-8 md:ml-12 text-black">
               <img
                 src={slide.logo}
-                alt={`${slide.title} Logo`}
+                alt={`${slide.product.title} Logo`}
                 className="w-8 h-8 mb-3"
               />
               <h2 className="text-2xl sm:text-3xl md:text-4xl xl:text-5xl font-bold">
-                {slide.title}
+                {slide.product.title}
               </h2>
               <p className="text-lg sm:text-xl md:text-2xl xl:text-3xl">
-                {slide.subtitle}
+                {slide.product.promoTagline}
               </p>
-              <button className="mt-4 text-sm sm:text-base md:text-lg xl:text-xl underline flex items-center">
+              <button 
+              onClick={() => navigate(`/product/${slide.product._id}`)}
+              className="mt-4 text-sm sm:text-base md:text-lg xl:text-xl underline flex items-center">
                 Shop Now{" "}
                 <span className="ml-2">
                   <svg

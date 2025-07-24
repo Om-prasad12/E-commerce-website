@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
-const Highlight = () => {
-  const targetDate = "2025-04-18T00:00:00";
+const Highlight = ({data}) => {
+  const targetDate = "2025-08-18T00:00:00";
+  const navigate = useNavigate();
 
   const calculateTimeLeft = () => {
     const difference = +new Date(targetDate) - +new Date();
@@ -29,6 +31,20 @@ const Highlight = () => {
     return () => clearInterval(timer); // Cleanup interval on unmount
   }, []);
 
+  const [mainContent,setMainContent] = useState([
+          
+      ]);
+      
+      useEffect(() => {
+          if (data && data.length > 0) {
+            setMainContent(data);
+          } else {
+            // console.error("No data available for the carousel.");
+          }
+      },[data])
+
+  
+
   return (
     <section className={`w-[80%] m-auto mb-10  xl:mb-14`}>
     <div className="w-[95%] max-w-[1170px] h-auto bg-gradient-to-r from-black to-gray-900 flex flex-col md:flex-row items-center px-6 md:px-10 py-10 mb-5 md:mb-20">
@@ -37,7 +53,7 @@ const Highlight = () => {
       <div className="w-full md:w-1/2 text-white text-center md:text-left">
         <p className="text-green-500 font-semibold text-lg">Categories</p>
         <h2 className="text-4xl md:text-5xl font-bold leading-tight my-4">
-          Enhance Your <br className="hidden md:block" /> Music Experience
+          {mainContent[0]?.product?.promoTagline}
         </h2>
 
         {/* Countdown Timer */}
@@ -58,7 +74,15 @@ const Highlight = () => {
         </div>
 
         {/* Button */}
-        <button className="bg-green-500 text-black font-semibold py-3 px-6 rounded-lg mt-4 hover:bg-green-600 transition hidden md:block">
+        <button className="bg-green-500 text-black font-semibold py-3 px-6 rounded-lg mt-4 hover:bg-green-600 transition hidden md:block"
+        onClick={() => {
+            const productId = mainContent[0]?.product?._id ;
+            if (productId) {
+              navigate(`/product/${productId}`);
+            } else {
+              console.log("No product ID available for navigation.");
+            }
+          }}>
           Buy Now!
         </button>
       </div>
@@ -66,15 +90,26 @@ const Highlight = () => {
       {/* Right Image (Responsive) */}
       <div className="w-full md:w-1/2 flex justify-center mt-6 md:mt-0">
         <img
-          src="../../assets/Highlight/JBL.png"
+          src={mainContent[0]?.product?.images[0]}
           alt="JBL Speaker"
           className="w-[80%] md:w-[500px] h-auto"
         />
       </div>
       <div className='md:hidden '>
-        <button className="bg-green-500 text-black font-semibold py-3 px-6 rounded-lg mt-4 hover:bg-green-600 transition">
+        <button
+          className="bg-green-500 text-black font-semibold py-3 px-6 rounded-lg mt-4 hover:bg-green-600 transition"
+          onClick={() => {
+            const productId = mainContent[0]?.product?._id ;
+            if (productId) {
+              navigate(`/product/${productId}`);
+            } else {
+              console.log("No product ID available for navigation.");
+            }
+          }}
+        >
           Buy Now!
-        </button></div>
+        </button>
+        </div>
     </div>
     </section>
   );

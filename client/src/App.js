@@ -11,6 +11,7 @@ import NotFound from './components/Error404';
 import Wishlist from './components/Wishlist';
 import Cart from './components/Cart';
 import Checkout from './components/Checkout';
+import ProductPage from './components/ProductPage'; // Importing ProductPage component
 const App = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
@@ -31,6 +32,7 @@ const App = () => {
         <Route path="/wishlist" element={<Wishlist />} />
         <Route path="/cart" element={<Cart/>} />
         <Route path="/checkout" element={<Checkout/>} />
+        <Route path="/product/:id" element={<ProductPage />} /> {/* Route for ProductPage */}
       </Routes>
       <Footer />
     </div>

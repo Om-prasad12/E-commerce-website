@@ -1,7 +1,17 @@
-import React from 'react'
+import React,{useState,useEffect}from 'react'
 import { Link } from "react-router-dom";
 
-const Featured = () => {
+const Featured = ({data}) => {
+   const [mainContent,setMainContent] = useState([]);
+       
+  useEffect(() => {
+        if (data && data.length > 0) {
+          setMainContent(data);
+        } else {
+          // console.error("No data available for the carousel.");
+        }
+  },[data])
+
   return (
     <>
       <div className="bg-gray-100 xl:bg-gray-300">
