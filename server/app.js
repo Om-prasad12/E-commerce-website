@@ -10,9 +10,12 @@ app.listen(port,(req, res)=> {
     console.log("Connection has been made")
 })
 
+
+
 var corsOptions = {
   origin: 'http://localhost:3000',
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  credentials: true,
   optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
 }
 app.use(cors(corsOptions));

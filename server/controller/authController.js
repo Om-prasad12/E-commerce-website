@@ -33,7 +33,8 @@ async function userSignup(req, res) {
     res.cookie("id", token, {
       maxAge: 24 * 60 * 60 * 1000,
       httpOnly: true,
-      secure: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite:process.env.NODE_ENV === "production" ? 'none' : 'lax'
     });
 
     return res.status(201).json({
@@ -76,11 +77,13 @@ async function userLogin(req, res) {
     res.cookie("id", token, {
       maxAge: 24 * 60 * 60 * 1000,
       httpOnly: true,
-      secure: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite:process.env.NODE_ENV === "production" ? 'none' : 'lax'
     });
     console.log("User logged in successfully:", user.email);
     res.status(200).json({
       message: "Login successful",
+      token,
     });
   } catch (error) {
     console.error("Error logging in user:", error);
@@ -131,4 +134,24 @@ async function verifyEmail(req, res) {
     });
   }
 }
-module.exports = { userSignup, userLogin, verifyEmail };
+
+// Additional route to check if user is logged in
+function checkLoginStatus(req, res) {
+  if (req.userId) {
+    return res.status(200).json({ loggedIn: true });
+  } else {
+    return res.status(200).json({ loggedIn: false });
+  }
+}
+
+//Fucntion for logout
+function userLogout(req, res) {
+  res.clearCookie("id", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax"
+  });
+  return res.status(200).json({ message: "Logout successful" });
+}
+
+module.exports = { userSignup, userLogin, verifyEmail, checkLoginStatus, userLogout };
