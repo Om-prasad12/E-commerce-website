@@ -11,6 +11,8 @@ import {
 } from "./SalesCarouselArrowButton";
 import useEmblaCarousel from "embla-carousel-react";
 import CountdownTimer from "./CountdownTimer";
+import axios from "axios";
+import {toast} from "react-toastify";
 
 const Salescarousel = ({data}) => {
   const navigate = useNavigate();
@@ -39,6 +41,25 @@ const Salescarousel = ({data}) => {
     onPrevButtonClick,
     onNextButtonClick,
   } = usePrevNextButtons(emblaApi);
+
+  const handleWishlist = async (_id, userId) => {
+    try {
+      const res = await axios.post(`${process.env.REACT_APP_API_BASE_URL}user/wishlist`, {
+        productId: _id,
+        vendorId: userId,
+        },{
+           withCredentials: true 
+        });
+      if(res.status === 200) {
+        toast.success("Product added to wishlist");
+      } else{
+        toast.error(res.data.message || "Failed to add to wishlist");
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Failed to add to wishlist");
+      // console.error("Failed to add to wishlist:", error);
+    }
+  };
 
   return (
     <>
@@ -90,7 +111,7 @@ const Salescarousel = ({data}) => {
       <div className={`${styles.embla__viewport} mt-8`} ref={emblaRef}>
         <div className={styles.embla__container}>
           {mainContent.map((data) => {
-            const {_id, images, discount, price, actualPrice, ratings } = data.product;
+            const {_id, images, discount, price, actualPrice, ratings,userId } = data.product;
 
             return (
               <div className={styles.embla__slide} key={_id}>
@@ -107,8 +128,9 @@ const Salescarousel = ({data}) => {
                   <div className="absolute top-2 right-1 flex space-x-2">
                     <button className="p-2 bg-white rounded-full shadow"
                       onClick={(e) => {
+                      e.preventDefault();
                       e.stopPropagation();  //Stop event bubbling to parent div
-                      navigate('/likedProducts');
+                      handleWishlist(_id, userId);
                     }}>
                       <CiHeart />
                     </button>

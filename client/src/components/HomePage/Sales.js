@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Stars from "./Stars";
 import { CiHeart } from "react-icons/ci";
+import axios from "axios";
+import {toast} from "react-toastify";
 
 const Sales = ({data}) => {
   const navigate = useNavigate();
@@ -17,6 +19,25 @@ const Sales = ({data}) => {
           // console.error("No data available for the carousel.");
         }
     },[data])
+
+  const handleWishlist = async (_id, userId) => {
+    try {
+      const res = await axios.post(`${process.env.REACT_APP_API_BASE_URL}user/wishlist`, {
+        productId: _id,
+        vendorId: userId,
+        },{
+           withCredentials: true 
+        });
+      if(res.status === 200) {
+        toast.success("Product added to wishlist");
+      } else{
+        toast.error(res.data.message || "Failed to add to wishlist");
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Failed to add to wishlist");
+      // console.error("Failed to add to wishlist:", error);
+    }
+  };  
 
 
   const [visibleItems, setVisibleItems] = useState(4);
@@ -69,7 +90,7 @@ const Sales = ({data}) => {
             </div>
 
             <div className="flex justify-center md:justify-start m-4 overflow-hidden gap-x-4 md:gap-x-6">
-              {mainContent.slice(0, visibleItems).map(({product: { _id,images,title,discount,ratings,actualPrice,price } }) => (
+              {mainContent.slice(0, visibleItems).map(({product: { _id,images,title,discount,ratings,actualPrice,price,userId } }) => (
                 <div
                   key={_id}
                   style={{
@@ -90,7 +111,7 @@ const Sales = ({data}) => {
                       <button className="p-2 bg-white rounded-full shadow"
                         onClick={(e) => {
                           e.stopPropagation();  // Stop event bubbling to parent div
-                          navigate('/likedProducts');
+                          handleWishlist(_id, userId);
                         }}>
                         <CiHeart />
                       </button>
