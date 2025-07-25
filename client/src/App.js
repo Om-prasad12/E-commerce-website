@@ -14,20 +14,22 @@ import Checkout from './components/Checkout';
 import ProductPage from './components/ProductPage'; // Importing ProductPage component
 const App = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [loggedIn, setLoggedIn] = useState(false);
 
+  
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
   };
 
   return (
     <div>
-      <Navbar toggleSidebar={toggleSidebar} />
+      <Navbar toggleSidebar={toggleSidebar} loggedIn={loggedIn} setLoggedIn={setLoggedIn}/>
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<SignUp />} />
+        <Route path="/login" element={<Login setLoggedIn={setLoggedIn}/>} />
+        <Route path="/signup" element={<SignUp setLoggedIn={setLoggedIn}/>} />
         <Route path="*" element={<NotFound />} />
         <Route path="/wishlist" element={<Wishlist />} />
         <Route path="/cart" element={<Cart/>} />

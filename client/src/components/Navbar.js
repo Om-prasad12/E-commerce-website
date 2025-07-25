@@ -1,16 +1,19 @@
-import React, { useState, useEffect, useRef } from "react";
-import { Link } from "react-router-dom";
+import React, { useState, useEffect, useRef} from "react";
+import { useNavigate, Link } from "react-router-dom";
+import axios from "axios";
 import { IoMdSearch, IoMdMenu } from "react-icons/io";
 import { RiShoppingCart2Line } from "react-icons/ri";
 import { FaRegHeart } from "react-icons/fa";
 import { CgProfile } from "react-icons/cg";
 import "../App.css";
 
-const Navbar = ({ toggleSidebar }) => {
+const Navbar = ({ toggleSidebar,loggedIn,setLoggedIn }) => {
   const [showMenu, setShowMenu] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [prevScrollPos, setPrevScrollPos] = useState(window.scrollY);
   const [visible, setVisible] = useState(true);
+
+  const navigate = useNavigate();
 
   const menuRef = useRef(null);
   const menuButtonRef = useRef(null);
@@ -22,6 +25,32 @@ const Navbar = ({ toggleSidebar }) => {
   const handleProfileMenuToggle = () => {
     setShowProfileMenu(!showProfileMenu);
   };
+
+  const handleLogout= () =>{
+    axios.get(`${process.env.REACT_APP_API_BASE_URL}auth/logout`, {
+      withCredentials: true
+    }).then((res) => {
+      // console.log("Logout successful:", res.data);
+      setLoggedIn(false);
+      navigate("/");
+    }).catch((err) => {
+      console.error("Logout error:", err);
+    });
+  }
+
+  // Check if user is logged in
+  useEffect(() => {
+    axios.get(`${process.env.REACT_APP_API_BASE_URL}auth/isloggedin`, {
+     withCredentials: true
+    }).then((res) => {
+      setLoggedIn(res.data.loggedIn);
+      console.log("User logged in status:", res.data.loggedIn);
+      })
+      .catch(() => {
+      setLoggedIn(false);
+      });
+  },[loggedIn]);
+
 
   useEffect(() => {
     const handleScroll = () => {
@@ -123,55 +152,80 @@ const Navbar = ({ toggleSidebar }) => {
 
             {/* Icons */}
             <ul className="hidden md:flex items-center gap-4 xl:gap-6">
-              <Link
-                to="/wishlist"
-                className="text-2xl hover:bg-gray-200 p-2 rounded-md transition-all"
-              >
-                <FaRegHeart />
-              </Link>
-              <Link
-                to="/cart"
-                className="text-2xl hover:bg-gray-200 p-2 rounded-md transition-all"
-              >
-                <RiShoppingCart2Line />
-              </Link>
-              <div
-                className="text-2xl hover:bg-gray-200 p-2 rounded-md transition-all cursor-pointer"
-                onClick={handleProfileMenuToggle}
-              >
-                <CgProfile />
-              </div>
+              {loggedIn ? (
+                <>
+                  <Link
+                    to="/wishlist"
+                    className="text-2xl hover:bg-gray-200 p-2 rounded-md transition-all"
+                  >
+                    <FaRegHeart />
+                  </Link>
+                  <Link
+                    to="/cart"
+                    className="text-2xl hover:bg-gray-200 p-2 rounded-md transition-all"
+                  >
+                    <RiShoppingCart2Line />
+                  </Link>
+                  <div
+                    className="text-2xl hover:bg-gray-200 p-2 rounded-md transition-all cursor-pointer"
+                    onClick={handleProfileMenuToggle}
+                  >
+                    <CgProfile />
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div
+                    className="text-2xl hover:bg-gray-200 p-2 rounded-md transition-all cursor-pointer"
+                    onClick={handleProfileMenuToggle}
+                  >
+                    <CgProfile />
+                  </div>
+                </>
+              )}
 
-              {/* Profile dropdown */}
               {showProfileMenu && (
                 <div
                   className="absolute top-full right-0 mt-2 w-48 bg-white border border-gray-300 shadow-lg opacity-95 z-50"
                   onClick={() => setShowProfileMenu(false)}
                 >
-                  <Link
-                    to="/profile"
-                    className="block px-4 py-2 text-gray-700 hover:bg-gray-200"
-                  >
-                    Profile
-                  </Link>
-                  <Link
-                    to="/settings"
-                    className="block px-4 py-2 text-gray-700 hover:bg-gray-200"
-                  >
-                    Settings
-                  </Link>
-                  <Link
-                    to="/orders"
-                    className="block px-4 py-2 text-gray-700 hover:bg-gray-200"
-                  >
-                    Orders
-                  </Link>
-                  <Link
-                    to="/logout"
-                    className="block px-4 py-2 text-gray-700 hover:bg-gray-200"
-                  >
-                    Logout
-                  </Link>
+                  {loggedIn ? (
+                    <>
+                      <Link
+                        to="/profile"
+                        className="block px-4 py-2 text-gray-700 hover:bg-gray-200"
+                      >
+                        Profile
+                      </Link>
+                      <Link
+                        to="/orders"
+                        className="block px-4 py-2 text-gray-700 hover:bg-gray-200"
+                      >
+                        Orders
+                      </Link>
+                      <Link
+                        className="block px-4 py-2 text-gray-700 hover:bg-gray-200"
+                        onClick={handleLogout}
+                      >
+                        Logout
+                      </Link>
+                    </>
+                  ) : (
+                    <>
+                      <Link
+                        to="/signup"
+                        className="block px-4 py-2 text-gray-700 hover:bg-gray-200"
+                      >
+                        Sign Up
+                      </Link>
+                      <Link
+                        to="/login"
+                        className="block px-4 py-2 text-gray-700 hover:bg-gray-200"
+                      >
+                        Login
+                      </Link>
+                    </>
+                  )}
                 </div>
               )}
             </ul>
@@ -197,23 +251,42 @@ const Navbar = ({ toggleSidebar }) => {
               style={{ transform: showMenu ? "translateY(0)" : "translateY(-100%)" }}
             >
               <li className="w-full text-center p-2 hover:bg-gray-200 rounded-md transition-all">
-                <Link to="/">Home</Link>
+                <Link to="/" onClick={handleMenuToggle}>Home</Link>
               </li>
               <li className="w-full text-center p-2 hover:bg-gray-200 rounded-md transition-all">
-                <Link to="/contact">Contact</Link>
+                <Link to="/contact" onClick={handleMenuToggle}>Contact</Link>
               </li>
               <li className="w-full text-center p-2 hover:bg-gray-200 rounded-md transition-all">
-                <Link to="/about">About</Link>
+                <Link to="/about" onClick={handleMenuToggle}>About</Link>
               </li>
-              <li className="w-full text-center p-2 hover:bg-gray-200 rounded-md transition-all">
-                <Link to="/wishlist">Wishlist</Link>
-              </li>
-              <li className="w-full text-center p-2 hover:bg-gray-200 rounded-md transition-all">
-                <Link to="/cart">Cart</Link>
-              </li>
-              <li className="w-full text-center p-2 hover:bg-gray-200 rounded-md transition-all">
-                <Link to="/profile">Profile</Link>
-              </li>
+              {loggedIn ? (
+                <>
+                  <li className="w-full text-center p-2 hover:bg-gray-200 rounded-md transition-all">
+                    <Link to="/profile" onClick={handleMenuToggle}>Profile</Link>
+                  </li>
+                  <li className="w-full text-center p-2 hover:bg-gray-200 rounded-md transition-all">
+                    <Link to="/wishlist" onClick={handleMenuToggle}>Wishlist</Link>
+                  </li>
+                  <li className="w-full text-center p-2 hover:bg-gray-200 rounded-md transition-all">
+                    <Link to="/cart" onClick={handleMenuToggle}>Cart</Link>
+                  </li>
+                  <li className="w-full text-center p-2 hover:bg-gray-200 rounded-md transition-all">
+                    <Link to="/orders" onClick={handleMenuToggle}>Orders</Link>
+                  </li>
+                  <li className="w-full text-center p-2 hover:bg-gray-200 rounded-md transition-all">
+                    <Link onClick={() => { handleLogout(); handleMenuToggle(); }}>Logout</Link>
+                  </li>
+                </>
+              ) : (
+                <>
+                  <li className="w-full text-center p-2 hover:bg-gray-200 rounded-md transition-all">
+                    <Link to="/signup" onClick={handleMenuToggle}>Sign Up</Link>
+                  </li>
+                  <li className="w-full text-center p-2 hover:bg-gray-200 rounded-md transition-all">
+                    <Link to="/login" onClick={handleMenuToggle}>Login</Link>
+                  </li>
+                </>
+              )}
             </ul>
           </>
         )}
