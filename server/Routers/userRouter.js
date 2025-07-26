@@ -2,7 +2,7 @@ const express = require('express')
 const userRouter=express.Router();
 const { verifyUser,isAdmin } = require('../middleware/authMiddleware');
 const {getUser,getUserId,getMyProfile,updateMyProfile,deleteMyProfile,
-  getMyCart,addToCart,updateCart,getMyWishlist,addToWishlist,deleteWishlist,getMyOrders
+  getMyCart,addToCart,updateCart,getMyWishlist,addToWishlist,deleteWishlist,getMyOrders,addOrderToUser
 } = require('../controller/userController');
 
 userRouter
@@ -38,6 +38,7 @@ userRouter
 userRouter
 .route('/orders')
 .get(verifyUser,getMyOrders)
+.post(verifyUser,addOrderToUser);
 
 userRouter
 .route('/getProfile/:id')

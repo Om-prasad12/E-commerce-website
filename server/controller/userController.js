@@ -51,7 +51,7 @@ async function updateMyProfile(req, res){
     try {
     const updates = req.body;
     const allowedUpdates = [
-      'name', 'phone', 'profilePicture', 'addresses','notifications', 'rewardsPoints', 'isBlocked'
+      'name', 'phone', 'profilePicture', 'addresses','notifications', 'rewardsPoints', 'isBlocked',
     ];
 
     // Optional: validate incoming fields
@@ -252,6 +252,30 @@ async function getMyOrders(req, res) {
     }
 }
 
+const addOrderToUser = async (req, res) => {
+  try {
+    const { orderId } = req.body; 
+    if (!orderId) {
+      return res.status(400).json({ message: "Order ID is required" });
+    }
+    const updatedUser = await userModel.findByIdAndUpdate(
+      req.userId,
+      { $push: { orders: orderId } },
+      { new: true }
+    );
+    if (!updatedUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    res.status(200).json({
+      message: "Order ID added to user's orders successfully",
+      user: updatedUser
+    });
+  } catch (error) {
+    console.error("Error updating user's orders:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 module.exports = {
     getUser,
     getUserId,
@@ -264,5 +288,6 @@ module.exports = {
     getMyWishlist,
     addToWishlist,
     deleteWishlist,
-    getMyOrders
+    getMyOrders,
+    addOrderToUser
 };
