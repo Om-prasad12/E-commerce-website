@@ -1,149 +1,152 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { IoCartOutline } from "react-icons/io5";
-
-const slides = [
-    {
-      id: 1,
-      image: "../../assets/Salescarousel/slide1.png",
-      discount: "-40%",
-      title: "HAVIT HV-G92 Gamepad",
-      price: "₹ 1,499",
-      actualPrice: "₹ 2,499",
-      ratings: 4.5,
-    },
-    {
-      id: 2,
-      image: "../../assets/Salescarousel/slide2.png",
-      discount: "-40%",
-      title: "HAVIT HV-G92 Gamepad",
-      price: "₹ 1,499",
-      actualPrice: "₹ 2,499",
-      ratings: 4.6,
-    },
-    {
-      id: 3,
-      image: "../../assets/Salescarousel/slide3.png",
-      discount: "-40%",
-      title: "HAVIT HV-G92 Gamepad",
-      price: "₹ 1,499",
-      actualPrice: "₹ 2,499",
-      ratings: 4.1,
-    },
-    {
-      id: 4,
-      image: "../../assets/Salescarousel/slide4.png",
-      discount: "-40%",
-      title: "HAVIT HV-G92 Gamepad",
-      price: "₹ 1,499",
-      actualPrice: "₹ 2,499",
-      ratings: 4.9,
-    },
-    {
-      id: 5,
-      image: "../../assets/Salescarousel/slide2.png",
-      discount: "-40%",
-      title: "HAVIT HV-G92 Gamepad",
-      price: "₹ 1,499",
-      actualPrice: "₹ 2,499",
-      ratings: 3.9,
-    },
-    {
-      id: 6,
-      image: "../../assets/Salescarousel/slide4.png",
-      discount: "-40%",
-      title: "HAVIT HV-G92 Gamepad",
-      price: "₹ 1,499",
-      actualPrice: "₹ 2,499",
-      ratings: 4.9,
-    },
-    {
-      id: 7,
-      image: "../../assets/Salescarousel/slide3.png",
-      discount: "-40%",
-      title: "HAVIT HV-G92 Gamepad",
-      price: "₹ 1,499",
-      actualPrice: "₹ 2,499",
-      ratings: 4.1,
-    },
-  ];
+import axios from "axios";
+import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 const Wishlist = () => {
-return (
-    <div className="bg-[#f9f6f2] ">
-        <div className="max-w-[1530px] mx-auto bg-white xl:shadow-lg mt-28 sm:mt-28 md:mt-36 xl:mt-40 px-4 sm:px-6">
-            <div className="w-full sm:w-[90%] md:w-[95%] mx-auto py-4 sm:py-6">
-                <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mb-6"> 
-                    <h2 className="text-xl sm:text-2xl font-medium">Wishlist</h2>
-                    <button className="text-black text-sm sm:text-base px-4 py-2 w-full sm:w-auto flex items-center justify-center gap-2 border-2 border-gray-300 rounded-md hover:bg-gray-200 transition">
-                        Move all to bag 
-                    </button>
-                </div>
-            </div>
-            
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 w-full sm:w-[90%] md:w-[95%] mx-auto 
-            max-w-[400px] sm:max-w-[600px] md:max-w-none pb-8">
-                {slides.map((data) => {
-                    const { id, image, discount, title, price, actualPrice, ratings } = data;
-                    return (
-                        <div className="w-full aspect-[4/3] sm:aspect-[3/4]" key={id}>
-                            <div className="border-2 rounded-md overflow-hidden relative h-full flex flex-col">
-                                {/* Discount Label */}
-                                {discount && (
-                                    <div className="absolute top-2 left-2 bg-red-500 text-white px-2 py-1 text-xs sm:text-sm font-bold">
-                                        {discount}
-                                    </div>
-                                )}
-                                
-                                {/* Delete Icon */}
-                                <div className="absolute top-2 right-2">
-                                    <button className="bg-white p-1.5 sm:p-2 rounded-full shadow-md hover:text-red-500 transition">
-                                        <RiDeleteBin6Line className="text-sm sm:text-base" />
-                                    </button>
-                                </div>
+  const [wishlistItems, setWishlistItems] = useState([]);
+  const navigate = useNavigate();
 
-                                {/* Product Image */}
-                                <div className="flex justify-center items-center  p-4 sm:p-6 md:p-8 bg-gray-100 flex-grow">
-                                    <img
-                                        src={image}
-                                        alt={title}
-                                        className="w-[120px] sm:w-[120px] md:w-[150px] xl:w-[172px]  aspect-[4/3]"
-                                    />
-                                </div>
-                                
-                                {/* Add to Cart Button */}
-                                <div className="mt-auto">
-                                    <button className="bg-black text-white px-3 py-2 w-full flex items</div>-center justify-center gap-2 text-sm sm:text-base transition hover:bg-gray-800">
-                                        <IoCartOutline className="text-lg" /> Add to Cart
-                                    </button>
-                                </div>
-                                
-                                {/* Price Section */}
-                                <div className="px-3 py-2 bg-white">
-                                    <p className="text-xs sm:text-sm truncate">{title}</p>
-                                    <div className="flex items-center mt-1">
-                                        <div className="text-red-500 text-sm sm:text-base font-bold mr-2">
-                                            {price}
-                                        </div>
-                                        {actualPrice && (
-                                            <div className="text-gray-400 text-xs sm:text-sm line-through">
-                                                {actualPrice}
-                                            </div>
-                                        )}
-                                    </div>
+  // Fetch wishlist items from backend
+  useEffect(() => {
+    const fetchWishlist = async () => {
+      try {
+        const res = await axios.get(
+          `${process.env.REACT_APP_API_BASE_URL}user/wishlist`,
+          {
+            withCredentials: true,
+          }
+        );
+        setWishlistItems(res.data || []);
+      } catch (error) {
+        console.error("Error fetching wishlist:", error);
+        toast.error("Failed to load wishlist");
+      }
+    };
 
-                                    {/* Ratings */}
-                                    <div className="flex space-x-1 w-auto h-auto mt-1">
-                                        {/* Rating stars could be added here */}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    );
-                })}
-            </div>
+    fetchWishlist();
+  }, []);
+
+  // Remove item from wishlist
+  const handleRemove = async (product) => {
+    try {
+      const res = await axios.delete(
+        `${process.env.REACT_APP_API_BASE_URL}user/wishlist/${product}`,
+        {
+          withCredentials: true,
+        }
+      );
+      setWishlistItems((prev) =>
+        prev.filter((item) => item.product._id !== product)
+      );
+      toast.info("Removed from wishlist");
+    } catch (error) {
+      console.error("Failed to remove item:", error);
+      toast.error(error.message || "Failed to remove item");
+    }
+  };
+
+  const handleAddToCart = async (productId, vendorId) => {
+    try {
+      const res = await axios.post(
+        `${process.env.REACT_APP_API_BASE_URL}user/cart`,
+        {
+          productId,
+          vendorId,
+        },
+        {
+          withCredentials: true,
+        }
+      );
+      toast.success("Added to cart");
+    } catch (error) {
+      // console.error("Error adding to cart:", error);
+      toast.error(error.response?.data?.message || error.message || "Failed to add cart item");
+    }
+  };
+
+  return (
+    <div className="bg-[#f9f6f2]">
+      <div className="max-w-[1530px] mx-auto bg-white xl:shadow-lg mt-28 px-4 sm:px-6">
+        <div className="w-full sm:w-[90%] md:w-[95%] mx-auto py-4 pt-10 ">
+          <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mb-6">
+            <h2 className="text-xl sm:text-2xl font-medium">Wishlist</h2>
+            {/* <button className="text-black text-sm sm:text-base px-4 py-2 border-2 border-gray-300 rounded-md hover:bg-gray-200 transition">
+              Move all to bag
+            </button> */}
+          </div>
         </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 w-full sm:w-[90%] md:w-[95%] mx-auto pb-8">
+          {wishlistItems.length === 0 ? (
+            <p className="text-center w-full col-span-full text-gray-500">
+              Your wishlist is empty
+            </p>
+          ) : (
+            wishlistItems.map((item) => {
+              const product = item.product;
+              return (
+                <div
+                  className="w-full aspect-[4/3] sm:aspect-[3/4]"
+                  key={product._id}
+                >
+                  <div
+                    className="border-2 rounded-md overflow-hidden relative h-full flex flex-col"
+                    onClick={() => navigate(`/product/${product._id}`)}
+                  >
+                    {/* Delete Icon */}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation(); // this prevents the click from reaching parent
+                        handleRemove(product._id);
+                      }}
+                      className="absolute top-2 right-2 bg-white p-1.5 rounded-full shadow-md hover:text-red-500 transition"
+                    >
+                      <RiDeleteBin6Line className="text-sm sm:text-base" />
+                    </button>
+
+                    {/* Product Image */}
+                    <div className="flex justify-center items-center p-6 bg-gray-100 flex-grow">
+                      <img
+                        src={product.images[0]}
+                        alt={product.title}
+                        className="w-[120px] sm:w-[150px] object-contain"
+                      />
+                    </div>
+
+                    {/* Add to Cart Button */}
+                    <button
+                      onClick={(e) =>{
+                        e.stopPropagation();
+                        handleAddToCart(product._id, product.vendorId)
+                      }}
+                      className="bg-black text-white px-3 py-2 w-full flex items-center justify-center gap-2 text-sm hover:bg-gray-800"
+                    >
+                      <IoCartOutline className="text-lg" /> Add to Cart
+                    </button>
+
+                    {/* Product Details */}
+                    <div className="px-3 py-2 bg-white">
+                      <p className="text-sm truncate">{product.title}</p>
+                      <div className="flex items-center mt-1">
+                        <div className="text-red-500 text-sm font-bold mr-2">
+                          ₹{product.price}
+                        </div>
+                        <div className="text-gray-400 text-xs line-through">
+                          ₹{product.actualPrice}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })
+          )}
+        </div>
+      </div>
     </div>
-);
+  );
 };
 
 export default Wishlist;

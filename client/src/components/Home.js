@@ -9,7 +9,7 @@ import Highlight from './HomePage/Highlight';
 import Featured from './HomePage/Featured'
 import Support from './HomePage/Support';
 const Home = ({sidebarOpen,toggleSidebar}) => {
-  const [mainCarousel, setMainCarousel] = useState([]);
+const [mainCarousel, setMainCarousel] = useState([]);
 const [sales, setSales] = useState([]);
 const [features, setFeatures] = useState([]);
 const [bestSellingProducts, setBestSellingProducts] = useState([]);
