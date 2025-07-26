@@ -13,9 +13,9 @@ const ProductPage = () => {
      
   }, [id]);
 
-  useEffect(() => {
-    console.log("Product data:", product);
-  }, [product]);
+  // useEffect(() => {
+  //   console.log("Product data:", product);
+  // }, [product]);
 
   return (
     <div className="p-4">

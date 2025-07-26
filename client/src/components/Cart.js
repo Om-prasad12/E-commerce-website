@@ -28,7 +28,7 @@ const Cart = () => {
 
   const handleUpdateCart = async (productId, quantity) => {
   try {
-    const res = await axios.patch(
+    await axios.patch(
       `${process.env.REACT_APP_API_BASE_URL}user/cart/${productId}`,
       { quantity },
       {
@@ -174,7 +174,8 @@ const Cart = () => {
                   </p>
                 </div>
                 <div className="flex justify-center mt-6">
-                  <button className="text-sm md:text-base font-medium bg-red-500 text-white px-4 py-2 rounded-[4px]">
+                  <button className="text-sm md:text-base font-medium bg-red-500 text-white px-4 py-2 rounded-[4px]"
+                    onClick={() => navigate("/checkout")}>
                     Proceed to checkout
                   </button>
                 </div>

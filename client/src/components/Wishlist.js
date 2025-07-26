@@ -6,6 +6,7 @@ import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 const Wishlist = () => {
   const [wishlistItems, setWishlistItems] = useState([]);
+  
   const navigate = useNavigate();
 
   // Fetch wishlist items from backend
@@ -31,7 +32,7 @@ const Wishlist = () => {
   // Remove item from wishlist
   const handleRemove = async (product) => {
     try {
-      const res = await axios.delete(
+      await axios.delete(
         `${process.env.REACT_APP_API_BASE_URL}user/wishlist/${product}`,
         {
           withCredentials: true,
@@ -49,7 +50,7 @@ const Wishlist = () => {
 
   const handleAddToCart = async (productId, vendorId) => {
     try {
-      const res = await axios.post(
+       await axios.post(
         `${process.env.REACT_APP_API_BASE_URL}user/cart`,
         {
           productId,
@@ -80,9 +81,9 @@ const Wishlist = () => {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 w-full sm:w-[90%] md:w-[95%] mx-auto pb-8">
           {wishlistItems.length === 0 ? (
-            <p className="text-center w-full col-span-full text-gray-500">
-              Your wishlist is empty
-            </p>
+            <p className="text-center text-gray-500 w-full col-span-full text-lg sm:text-xl py-20">
+                Your wishlist is empty. Time to shop!
+              </p>
           ) : (
             wishlistItems.map((item) => {
               const product = item.product;
