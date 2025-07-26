@@ -16,9 +16,9 @@ async function getHomePageData(req, res) {
 async function getHomePageDataByCategory(req, res) {
     const { category } = req.params;
     try {
-        const homeData = await homeModel.find({ category }).populate('product');
+        const homeData = await homeModel.find({ category });
         if( !homeData || homeData.length === 0) {
-            return res.status(404).json({ message: `No home page data found for category: ${category}` });
+            return res.status(404).json({ message: `No home page data found for category: ${category}`});
         }
         res.status(200).json(homeData);
         

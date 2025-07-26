@@ -21,13 +21,19 @@ userRouter
 .route('/cart')
 .get(verifyUser,getMyCart)
 .post(verifyUser,addToCart)
-.patch(verifyUser,updateCart)
+
+userRouter
+.route('/cart/:productId')
+.patch(verifyUser,updateCart);
 
 userRouter
 .route('/wishlist')
 .get(verifyUser,getMyWishlist)
 .post(verifyUser,addToWishlist)
-.delete(verifyUser,deleteWishlist)
+
+userRouter
+.route('/wishlist/:productId')
+.delete(verifyUser,deleteWishlist);
 
 userRouter
 .route('/orders')

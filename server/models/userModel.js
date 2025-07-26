@@ -159,10 +159,26 @@ userSchema.pre('save', async function() {
    this.confirmPassword=undefined; // Remove confirmPassword before saving
 });
 
-userSchema.pre('save', async function(){
-    let salt = await bcrypt.genSalt(10);
+
+
+userSchema.pre('save', async function(next) {
+  // Only hash if password is new or modified
+  if (!this.isModified('password')) return next();
+
+  if (!this.password) {
+    // Optional: throw an error or just skip hashing
+    return next(new Error('Password is missing'));
+  }
+
+  try {
+    const salt = await bcrypt.genSalt(10);
     this.password = await bcrypt.hash(this.password, salt);
-}); 
+    next();
+  } catch (err) {
+    next(err);
+  }
+});
+
    
 
 

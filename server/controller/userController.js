@@ -93,7 +93,7 @@ async function deleteMyProfile(req, res){
 //For user to get their cart
 async function getMyCart(req, res) {
   try {
-    const user = await userModel.findById(req.userId).select('cart');
+    const user = await userModel.findById(req.userId).select('cart').populate('cart.productId');
     if (!user) return res.status(404).json({ message: 'User not found' });
      
     res.status(200).json(user.cart);
@@ -116,6 +116,9 @@ async function addToCart(req, res) {
     // Check if product already exists in cart
     const existingItem = user.cart.find(item => item.productId.toString() === productId.toString());
     if (existingItem) {
+      if(existingItem.quantity==existingItem.maxQuantity){
+        return res.status(400).json({ message: 'Max limit reached' });
+      }
       existingItem.quantity +=1; // Update quantity
     } else {
       user.cart.push({ productId,vendorId}); // Add new item
@@ -132,7 +135,8 @@ async function addToCart(req, res) {
 //For user to update their cart
 async function updateCart(req, res) {
   try {
-    const { productId, quantity } = req.body;
+    const productId = req.params.productId;
+    const {  quantity } = req.body;
     if (!productId || !quantity) {
       return res.status(400).json({ message: 'Product ID and quantity are required' });
     }
@@ -165,7 +169,7 @@ async function updateCart(req, res) {
 //for user to get their wishlist
 async function getMyWishlist(req,res){
   try{
-      const user = await userModel.findById(req.userId).select('wishlist');
+      const user = await userModel.findById(req.userId).select('wishlist').populate('wishlist.product');
       if (!user) return res.status(404).json({ message: 'User not found' });
       res.status(200).json(user.wishlist);
   } catch(error) {
@@ -187,11 +191,11 @@ async function addToWishlist(req, res) {
 
     const alreadyInWishlist = user.wishlist.some(item => item.product.toString() === productId);
     if (alreadyInWishlist) {
-      return res.status(400).json({ message: 'Product already in wishlist' });
+      return res.status(409).json({ message: 'Product already in wishlist' });
     }
 
     if (user.wishlist.length >= 20) {
-      return res.status(400).json({ message: 'Wishlist limit reached (20 items)' });
+      return res.status(403).json({ message: 'Wishlist limit reached (20 items)' });
     }
 
     user.wishlist.push({ product: productId, vendorId });
@@ -207,30 +211,34 @@ async function addToWishlist(req, res) {
 
 //For user to delete item from their wishlist 
 async function deleteWishlist(req, res) {
-    try {
-        const { productId } = req.body;
-        if (!productId) {
-            return res.status(400).json({ message: 'Product ID is required' });
-        }
-
-        const user = await userModel.findById(req.userId);
-        if (!user) return res.status(404).json({ message: 'Login to delete product from wishlist' });
-
-        // Check if product exists in wishlist
-        const index = user.wishlist.indexOf(productId);
-        if (index === -1) {
-            return res.status(404).json({ message: 'Product not found in wishlist' });
-        }
-
-        user.wishlist.splice(index, 1); // Remove item
-        await user.save();
-        
-        res.status(200).json({ message: 'Item removed from wishlist', wishlist: user.wishlist });
-    } catch (error) {
-        console.error('Error deleting from wishlist:', error);
-        res.status(500).json({message:'Something went wrong',error:error.message});
+  console.log("Deleting from wishlist");
+  try {
+    const product = req.params.productId;
+    if (!product) {
+      return res.status(400).json({ message: 'Product ID is required' });
     }
+    const user = await userModel.findById(req.userId);
+    if (!user) return res.status(404).json({ message: 'Login to delete product from wishlist' });
+
+    // Find index using .findIndex()
+    const index = user.wishlist.findIndex(
+      (item) => item.product.toString() === product
+    );
+
+    if (index === -1) {
+      return res.status(404).json({ message: 'Product not found in wishlist' });
+    }
+
+    user.wishlist.splice(index, 1); // Remove item
+    await user.save();
+
+    res.status(200).json({ message: 'Item removed from wishlist', wishlist: user.wishlist });
+  } catch (error) {
+    console.error('Error deleting from wishlist:', error);
+    res.status(500).json({ message: 'Something went wrong', error: error.message });
+  }
 }
+
 
 async function getMyOrders(req, res) {
     try {
