@@ -64,6 +64,14 @@ const productSchema = new mongoose.Schema(
       type: String,
       unique: true,
     },
+    hasColor: {
+    type: Boolean,
+    default: false,
+    },
+    hasSize: {
+    type: Boolean,
+    default: false,
+  },
     ratings: {
       type: Number,
       default: 0,

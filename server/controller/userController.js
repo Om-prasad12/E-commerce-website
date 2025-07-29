@@ -106,7 +106,7 @@ async function getMyCart(req, res) {
 //For user to add item to their cart
 async function addToCart(req, res) {
   try {
-    const { productId,vendorId} = req.body;
+    const { productId, vendorId, quantity = 1 } = req.body;
     if (!productId) {
       return res.status(400).json({ message: 'Product ID and quantity are required' });
     }
@@ -121,7 +121,7 @@ async function addToCart(req, res) {
       }
       existingItem.quantity +=1; // Update quantity
     } else {
-      user.cart.push({ productId,vendorId}); // Add new item
+      user.cart.push({ productId,vendorId,quantity}); // Add new item
     }
 
     await user.save();
