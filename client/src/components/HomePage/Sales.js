@@ -51,7 +51,7 @@ const Sales = ({data}) => {
       } else if (window.innerWidth >= 768) {
         setVisibleItems(3);
       } else {
-        setVisibleItems(2);
+        setVisibleItems(1); // Changed from 2 to 1 for mobile
       }
     };
 
@@ -66,10 +66,32 @@ const Sales = ({data}) => {
         {/* Container with max width for centering content on large screens */}
         <div className="max-w-[1530px] mx-auto bg-white">
           <section className={`w-[90%] md:w-[80%] m-auto mb-10  xl:mb-14`}>
-            <div className="flex justify-between h-auto">
+            
+            {/* Mobile Header Design */}
+            <div className="md:hidden mb-6">
+              <div className="flex items-center mb-3">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="32" viewBox="0 0 20 40" fill="none">
+                  <rect width="20" height="40" rx="4" fill="#DB4444" />
+                </svg>
+                <p className="ml-2 text-sm font-semibold" style={{ color: "#DB4444" }}>
+                  This Month
+                </p>
+              </div>
+              <div className="mb-4">
+                <h2 className="text-xl font-bold tracking-wide mb-4 text-left">
+                  Best Selling Products
+                </h2>
+                <button className="bg-red-500 text-white font-semibold text-sm px-8 py-3 rounded-md hover:bg-red-600 transition-colors">
+                  View All
+                </button>
+              </div>
+            </div>
+
+            {/* Desktop Header Design */}
+            <div className="hidden md:flex justify-between h-auto">
               <div>
                 <div className="flex">
-                  <svg xmlns="http:/</div>/www.w3.org/2000/svg" width="20" height="40" viewBox="0 0 20 40" fill="none">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="40" viewBox="0 0 20 40" fill="none">
                     <rect width="20" height="40" rx="4" fill="#DB4444" />
                   </svg>
                   <p className="mt-2 mx-1 xl:m-3 text-base font-semibold" style={{ color: "#DB4444" }}>
@@ -83,7 +105,8 @@ const Sales = ({data}) => {
                 </div>
               </div>
               <div>
-                <button className="bg-red-500 text-white font-semibold text-sm md:text-lg px-10 md:px-12 py-4 my-10 xl:my-14">
+                <button className="bg-red-500 text-white font-semibold text-sm md:text-lg px-10 md:px-12 py-4 my-10 xl:my-14 hover:bg-red-600 transition-colors"
+                onClick={() => navigate("/best-selling-products")}>
                   View All
                 </button>
               </div>
@@ -102,13 +125,13 @@ const Sales = ({data}) => {
                 onClick={() => {navigate(`/product/${_id}`);}}>
                  <div className="border-2 rounded-lg overflow-hidden relative">
                     {discount && (
-                      <div className="absolute top-2 mx-2 bg-red-500 text-white px-3 py-1 text-base rounded-md font-bold">
+                      <div className="absolute top-2 mx-2 bg-red-500 text-white px-3 py-1 text-base rounded-md font-bold z-10">
                         -{discount}%
                       </div>
                     )}
 
-                    <div className="absolute top-2 right-1 flex space-x-2">
-                      <button className="p-2 bg-white rounded-full shadow"
+                    <div className="absolute top-2 right-1 flex space-x-2 z-10">
+                      <button className="p-2 bg-white rounded-full shadow hover:bg-gray-50 transition-colors"
                         onClick={(e) => {
                           e.stopPropagation();  // Stop event bubbling to parent div
                           handleWishlist(_id, userId);
@@ -131,7 +154,7 @@ const Sales = ({data}) => {
                         {actualPrice && <div className="text-gray-400 text-lg line-through m-2">{actualPrice}</div>}
                       </div>
 
-                      <div className="flex space-x-1 w-au</div>to h-auto">
+                      <div className="flex space-x-1 w-auto h-auto">
                         <Stars ratings={ratings} />
                       </div>
                     </div>

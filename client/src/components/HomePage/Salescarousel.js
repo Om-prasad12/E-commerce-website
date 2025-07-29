@@ -65,7 +65,7 @@ const Salescarousel = ({data}) => {
     <>
     <div className="bg-gray-100 xl:bg-gray-300">
       {/* Container with max width for centering content on large screens */}
-      <div className="max-w-[1530px] mx-auto bg-white ">
+      <div className="max-w-[1530px] mx-auto bg-white mt-8 md:mt-2">
     <section
       className={`${styles.embla} w-[90vw] sm:w-[80vw] m-auto md:w-full  md:pl-16 xl:pl-32 `}
     >
@@ -172,7 +172,8 @@ const Salescarousel = ({data}) => {
         </div>
       </div>
       <div className="flex justify-center">
-        <button className=" bg-red-500 text-white font-semibold text-sm md:text-lg px-10 md:px-12 py-4  my-10 xl:my-14" >View All Products</button>
+        <button className=" bg-red-500 text-white font-semibold text-sm md:text-lg px-10 md:px-12 py-4  my-10 xl:my-14" 
+        onClick={() => navigate("/flash-sales")}>View All Products</button>
       </div>
     </section>
     <hr className=" w-10/12   mx-auto border-gray-400 mb-5 md:mb-20" />

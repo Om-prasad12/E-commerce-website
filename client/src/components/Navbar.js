@@ -44,7 +44,7 @@ const Navbar = ({ toggleSidebar,loggedIn,setLoggedIn }) => {
      withCredentials: true
     }).then((res) => {
       setLoggedIn(res.data.loggedIn);
-      console.log("User logged in status:", res.data.loggedIn);
+      // console.log("User logged in status:", res.data.loggedIn);
       })
       .catch(() => {
       setLoggedIn(false);
