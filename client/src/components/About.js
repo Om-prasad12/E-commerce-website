@@ -51,7 +51,7 @@ const cards = [
 const About = () => {
   return (
     <div className="bg-[#f9f6f2]">
-      <div className="max-w-screen-2xl mx-auto bg-white xl:shadow-lg mt-28 sm:mt-28 md:mt-36 px-4 sm:px-6">
+      <div className="max-w-screen-2xl mx-auto bg-white xl:shadow-lg mt-28 sm:mt-28 md:mt-32 px-4 sm:px-6">
         <div className="w-full sm:w-[90%] md:w-[98%] mx-auto py-4 sm:py-6">
           <h2 className="text-md sm:text-xl pl-3 sm:pl-8 md:pl-9 xl:pl-16 pt-9 sm:py-3">
             About

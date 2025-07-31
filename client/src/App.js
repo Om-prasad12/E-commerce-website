@@ -11,7 +11,8 @@ import NotFound from './components/Error404';
 import Wishlist from './components/Wishlist';
 import Cart from './components/Cart';
 import Checkout from './components/Checkout';
-import ProductPage from './components/ProductPage'; // Importing ProductPage component
+import ProductPage from './components/ProductPage';
+import CategoryPage from './components/CategoryPage';
 const App = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [loggedIn, setLoggedIn] = useState(false);
@@ -35,6 +36,7 @@ const App = () => {
         <Route path="/cart" element={<Cart/>} />
         <Route path="/checkout" element={<Checkout/>} />
         <Route path="/product/:id" element={<ProductPage />} /> {/* Route for ProductPage */}
+        <Route path="/category/:id" element={<CategoryPage />} /> {/* Route for CategoryPage */}
       </Routes>
       <Footer />
     </div>

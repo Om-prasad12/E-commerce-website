@@ -18,29 +18,29 @@ const Sidebar = ({ isOpen, toggleSidebar, data}) => {
     {
       name: "Woman's Fashion",
       subcategories: [
-        { name: "Dresses", link: "/women/dresses" },
-        { name: "Pants", link: "/women/pants" },
-        { name: "Footwear", link: "/women/footwear" },
+        { name: "Dresses", link: "/category/women-dresses" },
+        { name: "Pants", link: "/category/women-pants" },
+        { name: "Footwear", link: "/category/women-footwear" },
       ],
     },
     {
       name: "Men's Fashion",
       subcategories: [
-        { name: "Dresses", link: "/men/dresses" },
-        { name: "Pants", link: "/men/pants" },
-        { name: "Footwear", link: "/men/footwear" },
+        { name: "Dresses", link: "/category/men-dresses" },
+        { name: "Pants", link: "/category/men-pants" },
+        { name: "Footwear", link: "/category/men-footwear" },
       ],
     },
   ];
 
   const otherLinks = [
-    { name: "Electronics", link: "/electronics" },
-    { name: "Home & Lifestyle", link: "/homelifestyle" },
-    { name: "Medicine", link: "/medicine" },
-    { name: "Sports & Outdoor", link: "/sports" },
-    { name: "Baby's", link: "/baby" },
-    { name: "Groceries", link: "/groceries" },
-    { name: "Health & Beauty", link: "/health" },
+    { name: "Electronics", link: "/category/electronics" },
+    { name: "Home & Lifestyle", link: "/category/homelifestyle" },
+    { name: "Health", link: "/category/medicine" },
+    { name: "Sports & Outdoor", link: "/category/sports" },
+    { name: "Baby's", link: "/category/baby" },
+    { name: "Groceries", link: "/category/groceries" },
+    { name: "Beauty", link: "/category/beauty" },
   ];
 
   return (

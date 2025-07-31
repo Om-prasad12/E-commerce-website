@@ -49,7 +49,7 @@ const Contact = () => {
 
   return (
     <div className="bg-[#f9f6f2]">
-      <div className="max-w-[1530px] mx-auto bg-white xl:shadow-lg mt-28 sm:mt-28 md:mt-36 px-4 sm:px-6 md:px-20 xl:px-32">
+      <div className="max-w-[1530px] mx-auto bg-white xl:shadow-lg mt-28 sm:mt-28 md:mt-32 px-4 sm:px-6 md:px-20 xl:px-32">
         <div className="w-full sm:w-[90%] md:w-full xl:w-[95%] mx-auto py-9 lg:py-12">
           
           {/* Breadcrumb */}
