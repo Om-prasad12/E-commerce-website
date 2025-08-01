@@ -121,11 +121,17 @@ const userSchema = new mongoose.Schema({
   }],
 
   notifications: [{
-    message: String,
-    isRead: { type: Boolean, default: false },
-    createdAt: { type: Date, default: Date.now }
+  message: String,
+  type: {
+    type: String,
+    enum: ['orderPlaced', 'shipped', 'delivered', 'cancelled','out-for-delivery'],
+    required: true,
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now
+  }
   }],
-
   role: {
     type: String,
     enum: ['user', 'admin', 'vendor'],

@@ -1,4 +1,5 @@
 const userModel = require('../models/userModel')
+const OrderModel = require('../models/orderModel');
 
 
 
@@ -242,13 +243,56 @@ async function deleteWishlist(req, res) {
 
 async function getMyOrders(req, res) {
     try {
-        const user = await userModel.findById(req.userId).populate('orders');
-        if (!user) return res.status(404).json({ message: 'User not found' });
+        // Alternative approach: Query orders directly
+        const orders = await OrderModel.find({ user: req.userId })
+            .populate('products.product')
+            .populate('products.vendorId', 'name email')
+            .sort({ createdAt: -1 }); // Latest orders first
         
-        res.status(200).json(user.orders);
+        if (!orders || orders.length === 0) {
+            return res.status(404).json({ 
+                success: false,
+                message: 'No orders found' 
+            });
+        }
+        
+        // Transform orders into array of arrays format
+        const ordersWithProducts = orders.map(order => {
+            // Extract product details for each order
+            const productsInOrder = order.products.map(item => ({
+                // Order level information
+                orderId: order._id,
+                orderStatus: order.orderStatus,
+                paymentStatus: order.paymentStatus,
+                totalAmount: order.totalAmount,
+                createdAt: order.createdAt,
+                deliveryDate: order.deliveryDate,
+                shippingAddress: order.shippingAddress,
+                
+                // Product level information
+                productId: item.product._id,
+                productDetails: item.product, // Full product object
+                vendorId: item.vendorId,
+                vendorDetails: item.vendorId, // Vendor info
+                quantity: item.quantity
+            }));
+            
+            return productsInOrder;
+        });
+        
+        res.status(200).json({
+            success: true,
+            totalOrders: ordersWithProducts.length,
+            orders: ordersWithProducts
+        });
+        
     } catch (error) {
         console.error('Error fetching orders:', error);
-        res.status(500).json({message:'Something went wrong',error:error.message});
+        res.status(500).json({
+            success: false,
+            message: 'Something went wrong',
+            error: error.message
+        });
     }
 }
 
@@ -276,6 +320,23 @@ const addOrderToUser = async (req, res) => {
   }
 };
 
+const addNotification = async (req, res) => {
+  try {
+    const { message, type } = req.body;
+    if (!message || !type) {
+      return res.status(400).json({ message: "Message and type are required" });
+    }
+    const user = await userModel.findById(req.userId);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+    user.notifications.push({ message, type });
+    await user.save();
+    res.status(200).json({ message: 'Notification added', notifications: user.notifications });
+  } catch (error) {
+    console.error('Error adding notification:', error);
+    res.status(500).json({message:'Something went wrong',error:error.message});
+  }
+};
+
 module.exports = {
     getUser,
     getUserId,
@@ -289,5 +350,6 @@ module.exports = {
     addToWishlist,
     deleteWishlist,
     getMyOrders,
-    addOrderToUser
+    addOrderToUser,
+    addNotification
 };

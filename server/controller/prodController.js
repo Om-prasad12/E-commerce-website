@@ -93,9 +93,9 @@ const getProductsByCategory= async (req,res) =>{
     try{
         const { category } = req.params;
         const products = await ProductModel.find({ category: new RegExp(category, 'i') }).lean(); // Case-insensitive search
-        if (!products || products.length === 0) {
-            return res.status(404).json({ message: 'No products found in this category' });
-        }
+        // if (!products || products.length === 0) {
+        //     return res.status(404).json({ message: 'No products found in this category' });
+        // }
         res.status(200).json(products);
     } catch (error) {
         console.error('Error fetching products by category:', error);
