@@ -13,6 +13,7 @@ import Cart from './components/Cart';
 import Checkout from './components/Checkout';
 import ProductPage from './components/ProductPage';
 import CategoryPage from './components/CategoryPage';
+import Profile from './components/Profile';
 const App = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [loggedIn, setLoggedIn] = useState(false);
@@ -37,6 +38,7 @@ const App = () => {
         <Route path="/checkout" element={<Checkout/>} />
         <Route path="/product/:id" element={<ProductPage />} /> {/* Route for ProductPage */}
         <Route path="/category/:id" element={<CategoryPage />} /> {/* Route for CategoryPage */}
+        <Route path="/profile" element={<Profile />} />
       </Routes>
       <Footer />
     </div>
