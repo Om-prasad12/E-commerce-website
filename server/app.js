@@ -13,7 +13,7 @@ app.listen(port,(req, res)=> {
 
 
 var corsOptions = {
-  origin: 'http://localhost:3000',
+  origin: process.env.BASE_URL.replace(/\/$/, ''),
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
   credentials: true,
   optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
