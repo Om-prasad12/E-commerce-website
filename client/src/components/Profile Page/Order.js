@@ -30,7 +30,9 @@ const Orders = ({ filter = "all" }) => {
       }
     };
 
-    fetchOrders();
+    if(!orders.length) {
+      fetchOrders();
+    }
   }, []);
 
   // Filter orders based on the filter prop
@@ -81,16 +83,6 @@ const Orders = ({ filter = "all" }) => {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-lg text-gray-600">Loading your orders...</p>
-        </div>
-      </div>
-    );
-  }
 
   if (filteredOrders.length === 0 && !loading) {
     return (

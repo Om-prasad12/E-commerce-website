@@ -10,6 +10,7 @@ const CategoryPage = () => {
   const [cartItems, setCartItems] = useState([]);
   const [sortBy, setSortBy] = useState("default");
   const [viewMode, setViewMode] = useState("grid");
+  const [isLoadingFromCache, setIsLoadingFromCache] = useState(false);
   const navigate = useNavigate();
 
   const categoryMap = {
@@ -25,8 +26,36 @@ const CategoryPage = () => {
 
   useEffect(() => {
     const fetchCart = async () => {
-      const queryCategory = categoryMap[id?.toLowerCase()] || id || "all";   
+      const queryCategory = categoryMap[id?.toLowerCase()] || id || "all";
+      const cacheKey = `categoryData_${queryCategory}`;
+      const cacheTimestampKey = `categoryDataTimestamp_${queryCategory}`;
+      const cacheExpiry = 5 * 60 * 1000; // 5 minutes in milliseconds (shorter for category data)
+      
       try {
+        // Check if data exists in localStorage first
+        const cachedData = localStorage.getItem(cacheKey);
+        const cacheTimestamp = localStorage.getItem(cacheTimestampKey);
+        
+        if (cachedData && cacheTimestamp) {
+          const isExpired = Date.now() - parseInt(cacheTimestamp) > cacheExpiry;
+          
+          if (!isExpired) {
+            // Use cached data - show loading for cache processing
+            setIsLoadingFromCache(true);
+            const data = JSON.parse(cachedData);
+            console.log("Using cached data for category:", queryCategory);
+            setCartItems(data || []);
+            setIsLoadingFromCache(false);
+            return; // Exit early, no API call needed
+          } else {
+            // Cache expired, remove old data
+            localStorage.removeItem(cacheKey);
+            localStorage.removeItem(cacheTimestampKey);
+          }
+        }
+
+        // If no cache or expired, fetch fresh data - no loading state (axios handles it)
+        console.log("Fetching fresh data for category:", queryCategory);
         const res = await axios.get(
           `${process.env.REACT_APP_API_BASE_URL}prod/category/${queryCategory}`,
           {
@@ -34,14 +63,24 @@ const CategoryPage = () => {
           }
         );
         console.log("API Response:", res.data);
-        setCartItems(res.data || []);
+        
+        const data = res.data || [];
+        
+        // Store in localStorage with timestamp
+        localStorage.setItem(cacheKey, JSON.stringify(data));
+        localStorage.setItem(cacheTimestampKey, Date.now().toString());
+        
+        setCartItems(data);
       } catch (error) {
         console.error("Error fetching cart:", error);
-        toast.error("Failed to load cart");
+        toast.error("Failed to load products");
       }
     };
     
     if (id) {
+      // Reset states when category changes
+      setCartItems([]);
+      setIsLoadingFromCache(false);
       fetchCart(); 
     }
   }, [id]);
@@ -67,6 +106,20 @@ const CategoryPage = () => {
     }
   };
 
+  // Function to clear cache for current category (useful for refresh scenarios)
+  const clearCategoryCache = () => {
+    const queryCategory = categoryMap[id?.toLowerCase()] || id || "all";
+    const cacheKey = `categoryData_${queryCategory}`;
+    const cacheTimestampKey = `categoryDataTimestamp_${queryCategory}`;
+    
+    localStorage.removeItem(cacheKey);
+    localStorage.removeItem(cacheTimestampKey);
+    
+    // Refetch data
+    setCartItems([]);
+    setIsLoadingFromCache(false);
+  };
+
   const sortProducts = (products) => {
     switch (sortBy) {
       case "price-low":
@@ -81,6 +134,22 @@ const CategoryPage = () => {
   };
 
   const sortedItems = sortProducts(cartItems);
+
+  // Loading state - only show when loading from cache
+  if (isLoadingFromCache) {
+    return (
+      <div className="bg-[#f9f6f2]">
+        <div className="max-w-screen-2xl mx-auto bg-white xl:shadow-lg mt-36 sm:mt-28 md:mt-32 px-4 sm:px-6">
+          <div className="w-full sm:w-[90%] md:w-[95%] mx-auto sm:py-6">
+            <div className="flex justify-center items-center py-20">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-500"></div>
+              <span className="ml-3 text-gray-600">Loading cached products...</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-[#f9f6f2]">
@@ -104,12 +173,27 @@ const CategoryPage = () => {
           {/* Category Header - Only show when there are products */}
           {sortedItems.length > 0 && (
             <div className="mb-8">
-              <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2 capitalize">
-                {categoryDisplayName}
-              </h1>
-              <p className="text-gray-600">
-                {`${sortedItems.length} products found`}
-              </p>
+              <div className="flex justify-between items-center">
+                <div>
+                  <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2 capitalize">
+                    {categoryDisplayName}
+                  </h1>
+                  <p className="text-gray-600">
+                    {`${sortedItems.length} products found`}
+                  </p>
+                </div>
+                
+                {/* Optional: Add refresh button for debugging/admin purposes */}
+                {process.env.NODE_ENV === 'development' && (
+                  <button
+                    onClick={clearCategoryCache}
+                    className="text-sm text-gray-500 hover:text-red-500 underline"
+                    title="Clear cache and refresh data"
+                  >
+                    Refresh Data
+                  </button>
+                )}
+              </div>
             </div>
           )}
 
@@ -263,7 +347,7 @@ const CategoryPage = () => {
           )}
 
           {/* Empty State */}
-          {sortedItems.length === 0 && (
+          {sortedItems.length === 0 && !isLoadingFromCache && (
             <div className="text-center py-16">
               <div className="w-24 h-24 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
                 <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
