@@ -29,6 +29,7 @@ const prodRouter=require('./Routers/prodRouter');
 const authRouter=require('./Routers/authRouter');
 const homeRouter=require('./Routers/homeRouter');
 const orderRouter=require('./Routers/orderRouter');
+const paymentRouter = require('./Routers/paymentRouter');
 
 
 app.use('/prod',prodRouter);
@@ -36,8 +37,7 @@ app.use('/user',userRouter);
 app.use('/auth',authRouter);
 app.use('/home',homeRouter); 
 app.use('/order',orderRouter);
-
-
+app.use('/payment', paymentRouter);
 
 app.use((req,res)=>{
     res.status(404).send('404 Page not found')
