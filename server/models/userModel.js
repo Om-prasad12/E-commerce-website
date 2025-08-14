@@ -1,4 +1,4 @@
-const mongoose= require('../db/db');
+const mongoose = require('mongoose');
 const emailValidator = require('email-validator');
 //For Hashing
 const bcrypt = require('bcrypt');

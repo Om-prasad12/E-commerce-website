@@ -1,16 +1,18 @@
-const mongoose = require('mongoose')
+const mongoose = require('mongoose');
 
+const connectDB = async () => {
+  const _db = process.env.DB;
 
-const _db=process.env.DB
-mongoose.connect(_db, { 
-  useNewUrlParser: true, 
-  useUnifiedTopology: true,
-  bufferMaxEntries: 0,
-  serverSelectionTimeoutMS: 30000,
-  socketTimeoutMS: 45000,
-  bufferCommands: false
-})
-  .then(() => console.log('MongoDB connected'))
-  .catch(err => console.error('MongoDB connection error:', err));
+  try {
+    // Wait for MongoDB connection before proceeding
+    await mongoose.connect(_db, {
+      serverSelectionTimeoutMS: 30000 // 30s timeout for slow Atlas connection
+    });
+    console.log('MongoDB connected');
+  } catch (err) {
+    console.error('MongoDB connection error:', err);
+    process.exit(1); // exit if DB fails to connect
+  }
+};
 
-module.exports = mongoose;
+module.exports = connectDB;
