@@ -3,6 +3,7 @@ import { useMemo } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import { loadStripe } from '@stripe/stripe-js';
 
 const Checkout = () => {
   const [cartItems, setCartItems] = useState([]);
@@ -19,6 +20,8 @@ const Checkout = () => {
   const [saveInfoChecked, setSaveInfoChecked] = useState(false);
   const [orderId, setOrderId] = useState(null);
   const navigate = useNavigate();
+  const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PUBLISHABLE_KEY);
+
 
   //To fetch cart item and user adress if there is any
   useEffect(() => {
@@ -92,9 +95,7 @@ const Checkout = () => {
       paymentStatus: "Pending",
     };
 
-    if (paymentMethod === "Bank") {
-      orderData.paymentStatus = "Paid";
-    }
+    if (paymentMethod === "COD") {
     try {
       const res = await axios.post(
         `${process.env.REACT_APP_API_BASE_URL}order`,
@@ -102,21 +103,43 @@ const Checkout = () => {
         { withCredentials: true }
       );
       setOrderId(res.data._id);
-      toast.success("Order placed successfully");  
+      toast.success("Order placed successfully");
       navigate(`/order/${res.data.order._id}`);
     } catch (error) {
       console.error("Error processing COD order:", error);
       toast.error("Failed to place order");
-      return;
     }
+  } else if (paymentMethod === "Bank") {
+    try {
+      // 1. Ask backend to create Stripe checkout session
+      const sessionRes = await axios.post(
+        `${process.env.REACT_APP_API_BASE_URL}payment/create-checkout-session`,
+        { orderData }, 
+        { withCredentials: true }
+      );
+
+      // 2. Redirect to Stripe
+      const stripe = await stripePromise;
+      const result = await stripe.redirectToCheckout({
+        sessionId: sessionRes.data.sessionId,
+      });
+      
+      if (result.error) {
+        toast.error(result.error.message);
+      }
+    } catch (error) {
+      console.error("Error starting Stripe checkout:", error);
+      toast.error("Failed to start payment");
+    }
+  }
   };
 
   useEffect(() => {
     const addOrderToUser = async (orderId) => {
       try {
-        const response = await axios.patch(
+        const response = await axios.post(
           `${process.env.REACT_APP_API_BASE_URL}user/orders`,
-          { orderId:orderId },
+          { orderId: orderId },
           { withCredentials: true }
         );
       } catch (error) {

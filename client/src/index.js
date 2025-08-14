@@ -14,7 +14,7 @@ root.render(
     <ToastContainer
       position="top-center"
       autoClose={3000}
-      hideProgressBar={false}
+      hideProgressBar={true}
       newestOnTop={false}
       closeOnClick={false}
       rtl={false}
@@ -22,6 +22,7 @@ root.render(
       draggable
       pauseOnHover
       theme="dark"
+      closeButton={false}
     />
   </BrowserRouter>
 );

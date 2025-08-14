@@ -17,6 +17,7 @@ import ProductPage from './components/ProductPage';
 import CategoryPage from './components/CategoryPage';
 import Profile from './components/Profile';
 import Loader from './components/Loader';
+import PaymentSuccess from './components/PaymentSuccess';
 
 const App = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -62,13 +63,14 @@ const App = () => {
         <Route path="/contact" element={<Contact />} />
         <Route path="/login" element={<Login setLoggedIn={setLoggedIn} />} />
         <Route path="/signup" element={<SignUp setLoggedIn={setLoggedIn} />} />
-        <Route path="*" element={<NotFound />} />
         <Route path="/wishlist" element={<Wishlist />} />
         <Route path="/cart" element={<Cart />} />
         <Route path="/checkout" element={<Checkout />} />
         <Route path="/product/:id" element={<ProductPage />} />
         <Route path="/category/:id" element={<CategoryPage />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/payment-success" element={<PaymentSuccess />} />
+        <Route path="*" element={<NotFound />} />
       </Routes>
       <Footer />
     </div>
