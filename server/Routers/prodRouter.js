@@ -1,5 +1,5 @@
 const express = require('express')
-const { createProduct,getAllProducts,getProductsByCategory,getProductById,updateProduct,deleteProduct,addReview,addrattings} = require('../controller/prodController');
+const { createProduct,getAllProducts,getProductsByCategory,getProductById,updateProduct,deleteProduct,addReview,addrattings,getProductsBySearchQuery,getProductSuggestions} = require('../controller/prodController');
 const { upload } = require('../middleware/multer');
 const { isAuthenticated, isAdmin,verifyUser,attachUserInfo} = require('../middleware/authMiddleware');
 const prodRouter=express.Router();
@@ -12,10 +12,17 @@ prodRouter
     .get(getAllProducts)      
     .post(verifyUser,isAuthenticated, upload.array('image', 5),createProduct);  
 
-
+prodRouter
+    .route('/suggestions')
+    .get(getProductSuggestions);
+    
 prodRouter
     .route('/category/:category')
     .get(getProductsByCategory); 
+
+prodRouter
+.route('/search')
+.get(getProductsBySearchQuery);    
 
 prodRouter
     .route('/:id')
@@ -29,7 +36,8 @@ prodRouter
 prodRouter
     .route('/rating/:id')
     .patch(verifyUser,attachUserInfo,addrattings);    
-    
+
+
 
 
 module.exports = prodRouter;

@@ -231,5 +231,115 @@ const addrattings = async (req, res) => {
 }
 
 
+const getProductsBySearchQuery= async (req,res)=>{
+    try {
+        const { q } = req.query;
+        
+        if (!q || q.trim() === '') {
+            return res.status(400).json({ message: 'Search query is required' });
+        }
 
-module.exports = { createProduct,getAllProducts,getProductsByCategory, getProductById, updateProduct, deleteProduct, addReview,addrattings};
+        // Fixed search criteria
+        const searchCriteria = {
+            $and: [
+                // Handle isDeleted field properly - include null/undefined as not deleted
+                { 
+                    $or: [
+                        { isDeleted: { $exists: false } }, // Field doesn't exist
+                        { isDeleted: false }, // Field exists and is false
+                        { isDeleted: null } // Field is null
+                    ]
+                },
+                {
+                    $or: [
+                        // Tags search (highest priority since required)
+                        { tags: { $in: [new RegExp(q, 'i')] } },
+                        // Title search (high priority)
+                        { title: { $regex: q, $options: 'i' } },
+                        // Brand search (medium priority)
+                        { brand: { $regex: q, $options: 'i' } },
+                        // Category search (lower priority since optional)
+                        { category: { $regex: q, $options: 'i' } },
+                        // Description search (lowest priority)
+                        { description: { $regex: q, $options: 'i' } },
+                    ]
+                }
+            ]
+        };
+
+        const products = await ProductModel.find(searchCriteria)
+            .populate('userId', 'name email')
+            .sort({ createdAt: -1 })
+            .limit(50);
+
+        res.json({
+            success: true,
+            products: products,
+            count: products.length,
+            query: q
+        });
+
+    } catch (error) {
+        console.error('Search error:', error);
+        res.status(500).json({ 
+            success: false, 
+            message: 'Error searching products',
+            error: error.message 
+        });
+    }
+}
+
+const getProductSuggestions = async (req, res) => {
+    try {
+        const { q } = req.query;
+        
+        if (!q || q.trim() === '' || q.length < 2) {
+            return res.json({
+                success: true,
+                suggestions: [],
+                query: q || ''
+            });
+        }
+
+        // Search criteria for suggestions (similar to main search but optimized)
+        const searchCriteria = {
+            $and: [
+                { isDeleted: { $ne: true } },
+                {
+                    $or: [
+                        { tags: { $in: [new RegExp(q, 'i')] } },
+                        { title: { $regex: q, $options: 'i' } },
+                        { brand: { $regex: q, $options: 'i' } },
+                        { category: { $regex: q, $options: 'i' } },
+                    ]
+                }
+            ]
+        };
+
+        // Get suggestions with minimal fields for performance
+        const suggestions = await ProductModel.find(searchCriteria)
+            .select('_id title category brand price images') // Only select needed fields
+            .sort({ ratings: -1, createdAt: -1 }) // Sort by ratings first
+            .limit(5); // Limit to 5 suggestions
+
+        res.json({
+            success: true,
+            suggestions: suggestions,
+            count: suggestions.length,
+            query: q
+        });
+
+    } catch (error) {
+        console.error('Suggestions error:', error);
+        res.status(500).json({ 
+            success: false, 
+            message: 'Error getting suggestions',
+            suggestions: [],
+            error: error.message 
+        });
+    }
+};
+
+
+
+module.exports = { createProduct,getAllProducts,getProductsByCategory, getProductById, updateProduct, deleteProduct, addReview,addrattings,getProductsBySearchQuery,getProductSuggestions};
