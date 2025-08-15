@@ -19,11 +19,12 @@ import Profile from './components/Profile';
 import Loader from './components/Loader';
 import PaymentSuccess from './components/PaymentSuccess';
 import Orders from './components/Orders';
+import SearchPage from './components/SearchPage'; 
 
 const App = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [loggedIn, setLoggedIn] = useState(false);
-  const [loading, setLoading] = useState(false); // New loading state
+  const [loading, setLoading] = useState(false);
 
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
@@ -31,19 +32,26 @@ const App = () => {
 
   useEffect(() => {
     const requestInterceptor = axios.interceptors.request.use((config) => {
-      if (config.method && config.method.toLowerCase() === 'get') {
-      setLoading(true);
+      // Check if this request should skip the loader
+      if (config.method && config.method.toLowerCase() === 'get' && !config.skipLoader) {
+        setLoading(true);
       }
       return config;
     });
 
     const responseInterceptor = axios.interceptors.response.use(
       (response) => {
-        setLoading(false);
+        // Only hide loader if it was shown (request didn't skip loader)
+        if (!response.config.skipLoader) {
+          setLoading(false);
+        }
         return response;
       },
       (error) => {
-        setLoading(false);
+        // Only hide loader if it was shown (request didn't skip loader)
+        if (!error.config?.skipLoader) {
+          setLoading(false);
+        }
         return Promise.reject(error);
       }
     );
@@ -56,7 +64,7 @@ const App = () => {
 
   return (
     <div>
-      {loading && <Loader />} {/* Show loader while loading */}
+      {loading && <Loader />}
       <Navbar toggleSidebar={toggleSidebar} loggedIn={loggedIn} setLoggedIn={setLoggedIn} />
       <Routes>
         <Route path="/" element={<Home />} />
@@ -72,6 +80,7 @@ const App = () => {
         <Route path="/profile" element={<Profile />} />
         <Route path="/payment-success" element={<PaymentSuccess />} />
         <Route path="/order/:orderId" element={<Orders />} />
+        <Route path="/search" element={<SearchPage />} /> 
         <Route path="*" element={<NotFound />} />
       </Routes>
       <Footer />

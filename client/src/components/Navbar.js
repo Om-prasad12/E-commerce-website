@@ -1,22 +1,200 @@
-import React, { useState, useEffect, useRef} from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 import { IoMdSearch, IoMdMenu } from "react-icons/io";
 import { RiShoppingCart2Line } from "react-icons/ri";
 import { FaRegHeart } from "react-icons/fa";
 import { CgProfile } from "react-icons/cg";
+import SearchSuggestions from "./SearchSuggestions";
 import "../App.css";
 
-const Navbar = ({ toggleSidebar,loggedIn,setLoggedIn }) => {
+const Navbar = ({ toggleSidebar, loggedIn, setLoggedIn }) => {
   const [showMenu, setShowMenu] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [prevScrollPos, setPrevScrollPos] = useState(window.scrollY);
   const [visible, setVisible] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [mobileSearchQuery, setMobileSearchQuery] = useState("");
+  
+  // States for suggestions
+  const [suggestions, setSuggestions] = useState([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [mobileSuggestions, setMobileSuggestions] = useState([]);
+  const [showMobileSuggestions, setShowMobileSuggestions] = useState(false);
+  const [suggestionLoading, setSuggestionLoading] = useState(false);
 
   const navigate = useNavigate();
-
   const menuRef = useRef(null);
   const menuButtonRef = useRef(null);
+  const searchRef = useRef(null);
+  const mobileSearchRef = useRef(null);
+
+  // Handle main search function with skipLoader
+  const handleSearch = async (query) => {
+    if (!query.trim()) return;
+    
+    try {
+      const response = await axios.get(
+        `${process.env.REACT_APP_API_BASE_URL}prod/search?q=${encodeURIComponent(query)}`,
+        { 
+          withCredentials: true,
+          skipLoader: true // This will prevent the main app loader from showing
+        }
+      );
+
+      navigate('/search', { 
+        state: { 
+          searchResults: response.data.products,
+          searchQuery: query,
+          totalResults: response.data.products.length
+        } 
+      });
+    } catch (error) {
+      console.error('Search error:', error);
+      navigate('/search', { 
+        state: { 
+          searchResults: [],
+          searchQuery: query,
+          totalResults: 0
+        } 
+      });
+    }
+  };
+
+  // Get suggestions from backend with skipLoader
+  const getSuggestions = useCallback(async (query) => {
+    if (!query.trim() || query.length < 2) {
+      return [];
+    }
+    
+    try {
+      setSuggestionLoading(true);
+      const response = await axios.get(
+        `${process.env.REACT_APP_API_BASE_URL}prod/suggestions?q=${encodeURIComponent(query)}`,
+        { 
+          withCredentials: true,
+          skipLoader: true // This will prevent the main app loader from showing
+        }
+      );
+      
+      setSuggestionLoading(false);
+      return response.data.suggestions || [];
+    } catch (error) {
+      console.error('Suggestions error:', error);
+      setSuggestionLoading(false);
+      return [];
+    }
+  }, []);
+
+  // Debounce function to avoid too many API calls
+  const debounce = (func, wait) => {
+    let timeout;
+    return function executedFunction(...args) {
+      const later = () => {
+        clearTimeout(timeout);
+        func(...args);
+      };
+      clearTimeout(timeout);
+      timeout = setTimeout(later, wait);
+    };
+  };
+
+  // Debounced suggestion function
+  const debouncedGetSuggestions = useCallback(
+    debounce(async (query, isMobile) => {
+      const newSuggestions = await getSuggestions(query);
+      
+      if (isMobile) {
+        setMobileSuggestions(newSuggestions);
+        setShowMobileSuggestions(newSuggestions.length > 0);
+      } else {
+        setSuggestions(newSuggestions);
+        setShowSuggestions(newSuggestions.length > 0);
+      }
+    }, 300), // 300ms delay
+    [getSuggestions]
+  );
+
+  // Handle desktop search input change
+  const handleDesktopInputChange = (e) => {
+    const value = e.target.value;
+    setSearchQuery(value);
+    
+    if (value.length >= 2) {
+      debouncedGetSuggestions(value, false);
+    } else {
+      setSuggestions([]);
+      setShowSuggestions(false);
+    }
+  };
+
+  // Handle mobile search input change
+  const handleMobileInputChange = (e) => {
+    const value = e.target.value;
+    setMobileSearchQuery(value);
+    
+    if (value.length >= 2) {
+      debouncedGetSuggestions(value, true);
+    } else {
+      setMobileSuggestions([]);
+      setShowMobileSuggestions(false);
+    }
+  };
+
+  // Handle suggestion click
+  const handleSuggestionClick = (product) => {
+    navigate(`/product/${product._id}`); // Use _id for MongoDB
+    setSearchQuery("");
+    setMobileSearchQuery("");
+    setShowSuggestions(false);
+    setShowMobileSuggestions(false);
+  };
+
+  // Handle desktop search
+  const handleDesktopSearch = (e) => {
+    if (e.key === 'Enter') {
+      handleSearch(searchQuery);
+      setSearchQuery("");
+      setShowSuggestions(false);
+    }
+  };
+
+  // Handle mobile search
+  const handleMobileSearch = (e) => {
+    if (e.key === 'Enter') {
+      handleSearch(mobileSearchQuery);
+      setMobileSearchQuery("");
+      setShowMobileSuggestions(false);
+    }
+  };
+
+  // Handle search icon click
+  const handleSearchIconClick = (isMobile = false) => {
+    const query = isMobile ? mobileSearchQuery : searchQuery;
+    handleSearch(query);
+    if (isMobile) {
+      setMobileSearchQuery("");
+      setShowMobileSuggestions(false);
+    } else {
+      setSearchQuery("");
+      setShowSuggestions(false);
+    }
+  };
+
+  // Handle click outside to close suggestions
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (searchRef.current && !searchRef.current.contains(event.target)) {
+        setShowSuggestions(false);
+      }
+      if (mobileSearchRef.current && !mobileSearchRef.current.contains(event.target)) {
+        setShowMobileSuggestions(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const handleMenuToggle = () => {
     setShowMenu(!showMenu);
@@ -30,7 +208,6 @@ const Navbar = ({ toggleSidebar,loggedIn,setLoggedIn }) => {
     axios.get(`${process.env.REACT_APP_API_BASE_URL}auth/logout`, {
       withCredentials: true
     }).then((res) => {
-      // console.log("Logout successful:", res.data);
       setLoggedIn(false);
       navigate("/");
     }).catch((err) => {
@@ -44,13 +221,11 @@ const Navbar = ({ toggleSidebar,loggedIn,setLoggedIn }) => {
      withCredentials: true
     }).then((res) => {
       setLoggedIn(res.data.loggedIn);
-      // console.log("User logged in status:", res.data.loggedIn);
       })
       .catch(() => {
       setLoggedIn(false);
       });
-  },[loggedIn]);
-
+  },[]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -103,15 +278,42 @@ const Navbar = ({ toggleSidebar,loggedIn,setLoggedIn }) => {
           </p>
         </div>
 
-        {/* Search bar (small screen) */}
+        {/* Search bar (small screen) - FIXED FOR MOBILE */}
         <div className="flex justify-between items-center bg-white z-50 sm:hidden">
-          <div className="flex items-center gap-3 border-2 border-gray-500 w-11/12 max-w-[450px] mx-auto mt-2 mb-1 overflow-hidden rounded-md">
+          <div 
+            ref={mobileSearchRef}
+            className="flex items-center gap-3 border-2 border-gray-500 w-11/12 max-w-[450px] mx-auto mt-2 mb-1 rounded-md relative"
+          >
             <input
               type="text"
               placeholder="What are you looking for?"
               className="p-2 w-full text-xs border-none focus:outline-none"
+              value={mobileSearchQuery}
+              onChange={handleMobileInputChange}
+              onKeyPress={handleMobileSearch}
+              onFocus={() => mobileSearchQuery.length >= 2 && setShowMobileSuggestions(true)}
             />
-            <IoMdSearch className="text-2xl cursor-pointer mr-2" />
+            <IoMdSearch 
+              className="text-2xl cursor-pointer mr-2" 
+              onClick={() => handleSearchIconClick(true)}
+            />
+            
+            {/* Mobile Suggestions - Now properly positioned */}
+            {showMobileSuggestions && (
+              <div className="absolute top-full left-0 right-0 z-[60] mt-1">
+                <SearchSuggestions
+                  suggestions={mobileSuggestions}
+                  onSuggestionClick={handleSuggestionClick}
+                  onSearchClick={(query) => {
+                    handleSearch(query);
+                    setShowMobileSuggestions(false);
+                  }}
+                  searchQuery={mobileSearchQuery}
+                  isLoading={suggestionLoading}
+                  isMobile={true}
+                />
+              </div>
+            )}
           </div>
         </div>
 
@@ -141,13 +343,38 @@ const Navbar = ({ toggleSidebar,loggedIn,setLoggedIn }) => {
           {/* Right-side Icons & Search */}
           <div className="flex items-center gap-2 md:gap-4 relative">
             {/* Desktop search bar */}
-            <div className="items-center hidden sm:flex gap-2 border-2 border-gray-500 px-2 rounded-md">
+            <div 
+              ref={searchRef}
+              className="items-center hidden sm:flex gap-2 border-2 border-gray-500 px-2 rounded-md relative"
+            >
               <input
                 type="text"
                 placeholder="What are you looking for?"
                 className="p-2 w-52 xl:w-64 text-xs border-none focus:outline-none"
+                value={searchQuery}
+                onChange={handleDesktopInputChange}
+                onKeyPress={handleDesktopSearch}
+                onFocus={() => searchQuery.length >= 2 && setShowSuggestions(true)}
               />
-              <IoMdSearch className="text-2xl cursor-pointer" />
+              <IoMdSearch 
+                className="text-2xl cursor-pointer" 
+                onClick={() => handleSearchIconClick(false)}
+              />
+              
+              {/* Desktop Suggestions - Original design preserved */}
+              {showSuggestions && (
+                <SearchSuggestions
+                  suggestions={suggestions}
+                  onSuggestionClick={handleSuggestionClick}
+                  onSearchClick={(query) => {
+                    handleSearch(query);
+                    setShowSuggestions(false);
+                  }}
+                  searchQuery={searchQuery}
+                  isLoading={suggestionLoading}
+                  isMobile={false}
+                />
+              )}
             </div>
 
             {/* Icons */}
@@ -196,12 +423,6 @@ const Navbar = ({ toggleSidebar,loggedIn,setLoggedIn }) => {
                         className="block px-4 py-2 text-gray-700 hover:bg-gray-200"
                       >
                         Profile
-                      </Link>
-                      <Link
-                        to="/orders"
-                        className="block px-4 py-2 text-gray-700 hover:bg-gray-200"
-                      >
-                        Orders
                       </Link>
                       <Link
                         className="block px-4 py-2 text-gray-700 hover:bg-gray-200"
