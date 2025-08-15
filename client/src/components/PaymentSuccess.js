@@ -62,7 +62,6 @@ useEffect(() => {
           { orderId: orderId },
           { withCredentials: true }
         );
-        toast.success("Order added to user profile");
       } catch (error) {
         console.error("Error fetching cart:", error);
       }
@@ -99,7 +98,7 @@ useEffect(() => {
         <div className="space-y-4">
           {orderId && (
             <button
-        onClick={() => navigate(`/orders/${orderId}`)}
+        onClick={() => navigate(`/order/${orderId}`)}
         className="bg-red-500 hover:bg-red-600 text-white px-8 py-3 rounded-lg font-medium transition-colors duration-200 mx-2"
             >
         View Order Details

@@ -18,6 +18,7 @@ import CategoryPage from './components/CategoryPage';
 import Profile from './components/Profile';
 import Loader from './components/Loader';
 import PaymentSuccess from './components/PaymentSuccess';
+import Orders from './components/Orders';
 
 const App = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -70,6 +71,7 @@ const App = () => {
         <Route path="/category/:id" element={<CategoryPage />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/payment-success" element={<PaymentSuccess />} />
+        <Route path="/order/:orderId" element={<Orders />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
       <Footer />
