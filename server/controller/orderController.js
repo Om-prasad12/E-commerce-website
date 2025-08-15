@@ -42,15 +42,20 @@ async function createOrder(req, res) {
 const getOrderById = async (req, res) => {
   const { id } = req.params;
   try {
-    const order = await OrderModel.findById(id);
+    const order = await OrderModel.findById(id)
+      .populate("user", "name email") // fetch user details
+      .populate("products.product");  // fetch product details
+
     if (!order) {
       return res.status(404).json({ message: 'Order not found' });
     }
+
     res.status(200).json(order);
   } catch (error) {
     res.status(500).json({ message: 'Error fetching order', error });
   }
-}
+};
+
 
 const updateOderStatus = async (req, res) => {
   try{
